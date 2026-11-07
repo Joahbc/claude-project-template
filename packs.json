@@ -1,0 +1,47 @@
+{
+  "_note": "Each pack lists skills to install per project, plugins it needs, and the default working mode. Skill names come from each repo; if an install fails, run `npx skills add <source> --list` to see current names and update this file.",
+  "globalPlugins": [
+    "superpowers@claude-plugins-official"
+  ],
+  "packs": {
+    "web-vanilla": {
+      "description": "Vanilla HTML/CSS/JS sites, GSAP animation, scrollytelling, portfolios",
+      "defaultMode": "Guided",
+      "skills": [
+        { "source": "greensock/gsap-skills", "skill": "gsap-core" },
+        { "source": "greensock/gsap-skills", "skill": "gsap-timeline" },
+        { "source": "greensock/gsap-skills", "skill": "gsap-scrolltrigger" },
+        { "source": "greensock/gsap-skills", "skill": "gsap-performance" },
+        { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
+        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" },
+        { "source": "Leonxlnx/taste-skill", "skill": "minimalist-ui" },
+        { "source": "Leonxlnx/taste-skill", "skill": "redesign-existing-projects" }
+      ],
+      "plugins": []
+    },
+    "shopify": {
+      "description": "Custom Shopify themes in Liquid, e-commerce sites and redesigns",
+      "defaultMode": "Guided",
+      "skills": [
+        { "source": "shopify/shopify-ai-toolkit", "skill": "shopify-liquid" },
+        { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
+        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" },
+        { "source": "Leonxlnx/taste-skill", "skill": "minimalist-ui" },
+        { "source": "Leonxlnx/taste-skill", "skill": "redesign-existing-projects" }
+      ],
+      "plugins": [
+        "liquid-lsp@claude-plugins-official"
+      ],
+      "requires": [
+        "Shopify CLI: npm install -g @shopify/cli",
+        "Free Shopify Partner account with a development store"
+      ]
+    },
+    "coursework": {
+      "description": "School projects with strict rules about what code and tools are allowed",
+      "defaultMode": "Directed",
+      "skills": [],
+      "plugins": []
+    }
+  }
+}

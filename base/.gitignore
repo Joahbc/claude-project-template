@@ -1,0 +1,18 @@
+# Claude Code: personal, per-machine settings
+.claude/settings.local.json
+
+# Superpowers scratch and worktrees
+.superpowers/
+.worktrees/
+
+# Secrets
+.env
+.env.*
+
+# Dependencies and builds
+node_modules/
+dist/
+build/
+
+# OS
+.DS_Store

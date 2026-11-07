@@ -1,0 +1,12 @@
+{
+  "name": "{{PROJECT_SLUG}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.48.0"
+  }
+}
