@@ -5,16 +5,38 @@
 // Read-only: it never changes, moves or deletes anything in the source folder.
 // No dependencies beyond Node itself.
 //
-// Usage: node source-scan.mjs <sourceDir> [outDir]
+// Usage: node source-scan.mjs <sourceDir> [outDir] [--exclude <path>]...
+//
+// --exclude <path> (repeatable, relative to sourceDir) skips a folder or file
+// completely: never read or stat'ed, never listed in the tree, and links that
+// point into it are not checked or reported. Use it for private client files.
 
 import { readdir, readFile, stat, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 
-const [srcArg, outDir = "docs/audit"] = process.argv.slice(2);
+const USAGE = "Usage: node source-scan.mjs <sourceDir> [outDir] [--exclude <path>]...";
+const positional = [];
+const excludeArgs = [];
+const argv = process.argv.slice(2);
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === "--exclude") {
+    const value = argv[++i];
+    if (!value || value.startsWith("--")) {
+      console.error(`--exclude needs a path.\n${USAGE}`);
+      process.exit(1);
+    }
+    excludeArgs.push(value);
+  } else if (argv[i].startsWith("--exclude=")) {
+    excludeArgs.push(argv[i].slice("--exclude=".length));
+  } else {
+    positional.push(argv[i]);
+  }
+}
+const [srcArg, outDir = "docs/audit"] = positional;
 if (!srcArg) {
-  console.error("Usage: node source-scan.mjs <sourceDir> [outDir]");
+  console.error(USAGE);
   process.exit(1);
 }
 const root = path.resolve(srcArg);
@@ -22,6 +44,17 @@ if (!existsSync(root)) {
   console.error(`Source folder not found: ${root}`);
   process.exit(1);
 }
+
+// Excluded paths as absolute paths inside root. Anything outside root is refused.
+const excluded = excludeArgs.map((e) => {
+  const abs = path.resolve(root, e.replace(/^\.\/+/, "").replace(/[\\/]+$/, ""));
+  if (abs === root || !abs.startsWith(root + path.sep)) {
+    console.error(`--exclude must be a path inside the source folder: ${e}`);
+    process.exit(1);
+  }
+  return abs;
+});
+const isExcluded = (abs) => excluded.some((e) => abs === e || abs.startsWith(e + path.sep));
 
 const SKIP_DIRS = new Set(["node_modules", ".git", ".next", ".vercel", ".cache", "dist", "build", ".superpowers", ".worktrees"]);
 const IMG_EXT = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".svg", ".ico"]);
@@ -45,6 +78,7 @@ async function walk(dir, files = []) {
       if (entry.isDirectory()) continue;
     }
     const full = path.join(dir, entry.name);
+    if (isExcluded(full)) continue;
     if (entry.isDirectory()) {
       if (!SKIP_DIRS.has(entry.name)) await walk(full, files);
     } else {
@@ -115,6 +149,8 @@ for (const f of html) {
     const target = m[1];
     if (/^(https?:|mailto:|tel:|javascript:|data:|\/\/)/i.test(target) || !target.trim()) continue;
     const resolved = target.startsWith("/") ? path.join(root, target) : path.join(dir, target);
+    // Never check or report links into an excluded path: that would reveal its file names
+    if (isExcluded(path.resolve(resolved))) continue;
     const candidates = [resolved, path.join(resolved, "index.html"), resolved + ".html"];
     if (!candidates.some((c) => existsSync(c))) brokenLocalLinks.push({ page: f.path, target });
   }
@@ -344,6 +380,7 @@ for (const p of pages) {
 const result = {
   sourceDir: root,
   scannedAt: new Date().toISOString(),
+  excluded: excluded.map(rel),
   totals: { files: files.length, kb: Math.round(files.reduce((s, f) => s + f.kb, 0) * 10) / 10, htmlPages: html.length, cssFiles: css.length, jsFiles: js.length, images: images.length, fonts: fonts.length },
   byType,
   tree: files.map((f) => `${f.path} (${f.kb} KB${f.lines ? `, ${f.lines} lines` : ""})`),
@@ -367,6 +404,7 @@ await writeFile(path.join(outDir, "source-data.json"), JSON.stringify(result, nu
 
 const formsAll = pages.flatMap((p) => p.forms.map((f) => ({ page: p.path, ...f })));
 console.log(`Scanned ${files.length} files (${result.totals.kb} KB): ${html.length} pages, ${css.length} CSS, ${js.length} JS, ${images.length} images`);
+if (excluded.length) console.log(`Excluded (not read or listed): ${result.excluded.join(", ")}`);
 console.log(`Libraries: ${libraries.join(", ") || "none detected"}`);
 console.log(`Duplicated across pages: header ${duplicates.header.length ? "yes" : "no"}, nav ${duplicates.nav.length ? "yes" : "no"}, footer ${duplicates.footer.length ? "yes" : "no"}, <style> blocks ${duplicates.style.length ? "yes" : "no"}`);
 console.log(`CSS: ${Object.keys(cssVars).length} custom properties (${cssStats.unusedCustomProperties.length} unused), ${cssStats.distinctColors} colors, ${cssStats.distinctFontSizes} font sizes, ${cssStats.importantCount} !important`);

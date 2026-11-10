@@ -2,6 +2,11 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.4.2 (2026-11-10)
+
+**From Brandrup Rådgivning:**
+- New `source-scan.mjs --exclude <path>` (repeatable, relative to the source folder) skips folders or files completely: never read or listed, and links into them are not checked or reported, so private client files leave no file names in the output. The audit skill asks about private folders and says to grep the output afterwards. Tested on a mock with two excluded folders (one nested, one under `share/`) and links into both: the control run listed all 7 names, the excluded run had none in `source-data.json` or `content-source/`, and a normal broken link was still reported. Mock deleted.
+
 ## 1.4.1 (2026-11-10)
 
 **From Brandrup Rådgivning:**

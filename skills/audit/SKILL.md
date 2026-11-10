@@ -138,6 +138,7 @@ Use when you have the site's source code (for example `original/` from `/kickoff
 node ~/.claude/skills/audit/scripts/source-scan.mjs <folder> docs/audit
 ```
 It is read-only and needs no dependencies. It writes `docs/audit/source-data.json` (file inventory, duplication, CSS tokens, libraries and CDNs, forms and where they send, possible secrets with masked values, placeholders, big and unused images, broken local links, hosting files) and `docs/audit/content-source/`, the exact text of each page from the HTML.
+- **Private files:** add `--exclude <path>` (repeatable, relative to the source folder) for folders or files that hold client documents, uploads or backups, for example `--exclude share/_files`. They're never read or listed, and links into them aren't checked or reported. Ask whether the source has such folders before scanning. Afterwards, grep the output for a few of the excluded names to confirm none leaked: other files (a manifest such as `shares.json`) can still mention them in placeholder context. Never list excluded file names in the audit or the chat.
 - Prefer `content-source/` over the crawler's `content/` for exact texts; use `content/` for what JavaScript renders
 - Write the Code section (9) of `audit.md` from `source-data.json`
 - Never copy a secret's value into any file or the chat, even partly beyond the scanner's mask
