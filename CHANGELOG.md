@@ -2,6 +2,13 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.4.4 (2026-11-10)
+
+**From Brandrup Rådgivning:**
+- Fix: the "[Bracketed Label]" placeholder check from 1.4.3 is now its own case-sensitive pattern and only runs on prose: HTML and PHP with tags, comments, `<script>`, `<style>` and `<?php ?>` blanked out (line numbers kept), and Markdown outside code. JS, CSS and JSON are never checked for brackets, and character classes like `[A-Za-z0-9]` are skipped. In 1.4.3 the shared `gi` flags made the capital-letter check case-insensitive, which gave 6 false positives on this site (`[a-z]`, `[A-Za-z0-9]`, `[name]` in `footer.js` and `share/index.php`). My 1.4.3 mock only used uppercase look-alikes, so the test missed it.
+
+Tested on the real source (private folders excluded, no names leaked): 13 placeholders, all real (12 in the references draft, 1 on the terms page), 0 false positives. Mock: bracket labels in HTML text and Markdown prose found; lowercase brackets, attributes, comments, script, PHP, JS, CSS, inline code, fenced code, Markdown links and `[A-Z]` in text skipped. Mock deleted.
+
 ## 1.4.3 (2026-11-10)
 
 **From Brandrup Rådgivning (client files in a `share/` folder, served by a local preview):**

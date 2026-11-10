@@ -330,9 +330,27 @@ for (const f of allText) {
 }
 
 // Danish phrases too: "kommer snart", "pladsholder", "Billede indsættes", "Tekst følger".
-// [Bracketed Labels] like "[Sagstitel]" or "[Kort beskrivelse af sagen]": starts with a capital,
-// no quotes or "=" inside (so CSS selectors and JS arrays don't match), not a Markdown link.
-const PLACEHOLDERS = /lorem ipsum|\bTODO\b|\bFIXME\b|\[to be added\]|\[insert[^\]]*\]|\bTBD\b|coming soon|kommer snart|your company|your name|example\.com|placeholder text|(this|denne) (page|side) (is|er) (a|en) (placeholder|pladsholder)|\bpladsholder\b|\b(billede|tekst|foto|logo) (indsættes|følger)\b|\[[A-ZÆØÅ][^\]\n"'=<>{}]{2,60}\](?!\()|xxx+|\+45 ?(00|12) ?(00|34) ?(00|56) ?(00|78)|\b123[- ]?456[- ]?789\b|\bdummy\b/gi;
+const PLACEHOLDERS = /lorem ipsum|\bTODO\b|\bFIXME\b|\[to be added\]|\[insert[^\]]*\]|\bTBD\b|coming soon|kommer snart|your company|your name|example\.com|placeholder text|(this|denne) (page|side) (is|er) (a|en) (placeholder|pladsholder)|\bpladsholder\b|\b(billede|tekst|foto|logo) (indsættes|følger)\b|xxx+|\+45 ?(00|12) ?(00|34) ?(00|56) ?(00|78)|\b123[- ]?456[- ]?789\b|\bdummy\b/gi;
+// [Bracketed Labels] like "[Sagstitel]" or "[Kort beskrivelse af sagen]". Its own check, case-SENSITIVE
+// (a real capital first), no quotes, "=", "\" or tags inside, not a Markdown link. It only runs on
+// prose: HTML and PHP with tags, <script>, <style> and <?php ?> blanked out, and Markdown outside code.
+// JS, CSS and JSON are code and are never checked for brackets.
+const BRACKET_LABEL = /\[[A-ZÆØÅ][^\]\n"'=<>{}\\]{2,60}\](?!\()/g;
+// A regex character class such as [A-Za-z0-9] or [A-Z_-]: only ranges, word characters and escapes
+const looksLikeCharClass = (inner) => /[A-Za-z0-9]-[A-Za-z0-9]/.test(inner) && !/\s/.test(inner);
+// Replace a region with spaces, keeping newlines, so offsets and line numbers stay correct
+const blank = (str) => str.replace(/[^\n]/g, " ");
+function prose(f) {
+  if ([".html", ".htm", ".php"].includes(f.ext)) {
+    return f.text
+      .replace(/<\?(php|=)?[\s\S]*?(\?>|$(?![\s\S]))/gi, blank)
+      .replace(/<!--[\s\S]*?-->/g, blank)
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, blank)
+      .replace(/<[^>]*>/g, blank);
+  }
+  if (f.ext === ".md") return f.text.replace(/```[\s\S]*?```/g, blank).replace(/`[^`\n]*`/g, blank);
+  return null;
+}
 // The bare word "placeholder" is only a finding in visible page text, never in code
 // (form attributes, ::placeholder in CSS, JS variables)
 const VISIBLE_PLACEHOLDER = /\bplaceholder\b/gi;
@@ -351,7 +369,18 @@ for (const f of allText.filter((x) => [".html", ".htm", ".php", ".js", ".css", "
       : maskTokens(norm(f.text.split("\n")[line - 1] || "")).slice(0, 120);
     placeholders.push({ file: f.path, line, match: m[0], context: lineText });
   }
+  const text = prose(f);
+  if (text == null) continue;
+  for (const m of text.matchAll(BRACKET_LABEL)) {
+    if (looksLikeCharClass(m[0].slice(1, -1))) continue;
+    const line = f.text.slice(0, m.index).split("\n").length;
+    const lineText = secretLines.has(`${f.path}:${line}`)
+      ? "(hidden: possible secret on this line)"
+      : maskTokens(norm(f.text.split("\n")[line - 1] || "")).slice(0, 120);
+    placeholders.push({ file: f.path, line, match: m[0], context: lineText });
+  }
 }
+placeholders.sort((a, b) => a.file.localeCompare(b.file) || (a.line ?? 0) - (b.line ?? 0));
 for (const p of pages) {
   for (const m of p.text.matchAll(VISIBLE_PLACEHOLDER)) {
     if (placeholders.some((x) => x.file === p.path && /placeholder/i.test(x.match))) continue;
