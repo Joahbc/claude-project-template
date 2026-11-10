@@ -11,7 +11,7 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 ## How we work
 - Ask before starting a new phase, experiment or large change. Don't run ahead.
 - Work in small steps and commit after each one
-- Every commit you help with ends with a `Co-Authored-By: Claude <noreply@anthropic.com>` line, so AI help is traceable in git history
+- Every commit you help with includes a Co-Authored-By line crediting Claude (the model name in it is fine), so AI help is traceable in git history.
 - For risky or visually significant changes: audit first, show me the findings, then apply after I approve
 - Verify before saying something is done: run it, test it, look at it. Say what you checked.
 - If a rule in CLAUDE.md seems wrong for the situation, tell me instead of silently ignoring it

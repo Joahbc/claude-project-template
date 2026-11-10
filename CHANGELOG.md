@@ -2,6 +2,11 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.0.2 (2026-11-10)
+
+**From kickoff-test:**
+- Fix: the Co-Authored-By rule in `user/CLAUDE.md` now accepts any line crediting Claude, model name included. The old rule required the exact `Claude <noreply@anthropic.com>` form, which clashed with Claude Code's default attribution.
+
 ## 1.0.1 (2026-11-10)
 
 Fixes from testing `/kickoff` on a fresh project.
