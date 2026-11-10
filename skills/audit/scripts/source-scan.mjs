@@ -52,6 +52,12 @@ const excluded = excludeArgs.map((e) => {
     console.error(`--exclude must be a path inside the source folder: ${e}`);
     process.exit(1);
   }
+  // A path that doesn't exist excludes nothing, so the private files would be scanned
+  // and listed. Fail instead of guessing. (Prints only the path the user gave.)
+  if (!existsSync(abs)) {
+    console.error(`--exclude path not found: ${e}\nIt is relative to the source folder (${root}). Nothing was scanned.`);
+    process.exit(1);
+  }
   return abs;
 });
 const isExcluded = (abs) => excluded.some((e) => abs === e || abs.startsWith(e + path.sep));
@@ -323,7 +329,13 @@ for (const f of allText) {
   }
 }
 
-const PLACEHOLDERS = /lorem ipsum|\bTODO\b|\bFIXME\b|\[to be added\]|\[insert[^\]]*\]|\bTBD\b|coming soon|your company|your name|example\.com|placeholder text|xxx+|\+45 ?(00|12) ?(00|34) ?(00|56) ?(00|78)|\b123[- ]?456[- ]?789\b|\bdummy\b/gi;
+// Danish phrases too: "kommer snart", "pladsholder", "Billede indsættes", "Tekst følger".
+// [Bracketed Labels] like "[Sagstitel]" or "[Kort beskrivelse af sagen]": starts with a capital,
+// no quotes or "=" inside (so CSS selectors and JS arrays don't match), not a Markdown link.
+const PLACEHOLDERS = /lorem ipsum|\bTODO\b|\bFIXME\b|\[to be added\]|\[insert[^\]]*\]|\bTBD\b|coming soon|kommer snart|your company|your name|example\.com|placeholder text|(this|denne) (page|side) (is|er) (a|en) (placeholder|pladsholder)|\bpladsholder\b|\b(billede|tekst|foto|logo) (indsættes|følger)\b|\[[A-ZÆØÅ][^\]\n"'=<>{}]{2,60}\](?!\()|xxx+|\+45 ?(00|12) ?(00|34) ?(00|56) ?(00|78)|\b123[- ]?456[- ]?789\b|\bdummy\b/gi;
+// The bare word "placeholder" is only a finding in visible page text, never in code
+// (form attributes, ::placeholder in CSS, JS variables)
+const VISIBLE_PLACEHOLDER = /\bplaceholder\b/gi;
 const placeholders = [];
 // Never echo a line that may hold a secret: its context is replaced, not printed
 const secretLines = new Set(secrets.map((s) => `${s.file}:${s.line}`));
@@ -340,10 +352,33 @@ for (const f of allText.filter((x) => [".html", ".htm", ".php", ".js", ".css", "
     placeholders.push({ file: f.path, line, match: m[0], context: lineText });
   }
 }
+for (const p of pages) {
+  for (const m of p.text.matchAll(VISIBLE_PLACEHOLDER)) {
+    if (placeholders.some((x) => x.file === p.path && /placeholder/i.test(x.match))) continue;
+    const context = maskTokens(p.text.slice(Math.max(0, m.index - 50), m.index + 70));
+    placeholders.push({ file: p.path, line: null, match: m[0], context: `(visible text) ${context}` });
+  }
+}
 
 // ---------- hosting and project files ----------
-const has = (name) => files.some((f) => f.path.toLowerCase() === name);
+// The web root is the shallowest folder with an index page: the source root itself, or a
+// subfolder such as www/, public_html/ or site/ when the source holds more than the site.
+const indexDirs = files
+  .filter((f) => /(^|\/)index\.(html?|php)$/i.test(f.path))
+  .map((f) => path.posix.dirname(f.path))
+  .map((d) => (d === "." ? "" : d));
+const webRoots = [...new Set(indexDirs)]
+  .sort((a, b) => a.split("/").length - b.split("/").length || a.localeCompare(b))
+  .filter((d, i, all) => d === "" || !all.slice(0, i).some((p) => p === "" || d.startsWith(p + "/")));
+if (webRoots.includes("")) webRoots.splice(0, webRoots.length, "");
+const webRoot = webRoots[0] ?? "";
+const inRoot = (name) => (webRoot ? `${webRoot}/${name}` : name);
+// Found at the web root or the source root (netlify.toml, package.json etc. often sit one level up)
+const has = (name) => files.some((f) => [inRoot(name), name].map((x) => x.toLowerCase()).includes(f.path.toLowerCase()));
 const hosting = {
+  webRoot: webRoot || ".",
+  otherWebRoots: webRoots.slice(1),
+  htaccessFiles: files.filter((f) => path.posix.basename(f.path) === ".htaccess").map((f) => f.path),
   htaccess: has(".htaccess"),
   robotsTxt: has("robots.txt"),
   sitemapXml: has("sitemap.xml"),
@@ -357,7 +392,7 @@ const hosting = {
   readme: files.some((f) => /^readme/i.test(f.path)),
   gitRepo: existsSync(path.join(root, ".git")),
 };
-const htaccessFile = files.find((f) => f.path === ".htaccess");
+const htaccessFile = files.find((f) => f.path === inRoot(".htaccess"));
 if (htaccessFile) {
   hosting.htaccessRules = {
     httpsRedirect: /RewriteCond\s+%\{HTTPS\}|https:\/\//i.test(htaccessFile.text),
@@ -404,6 +439,7 @@ await writeFile(path.join(outDir, "source-data.json"), JSON.stringify(result, nu
 
 const formsAll = pages.flatMap((p) => p.forms.map((f) => ({ page: p.path, ...f })));
 console.log(`Scanned ${files.length} files (${result.totals.kb} KB): ${html.length} pages, ${css.length} CSS, ${js.length} JS, ${images.length} images`);
+console.log(`Web root: ${hosting.webRoot}${hosting.otherWebRoots.length ? ` (also: ${hosting.otherWebRoots.join(", ")})` : ""}; .htaccess files: ${hosting.htaccessFiles.length}`);
 if (excluded.length) console.log(`Excluded (not read or listed): ${result.excluded.join(", ")}`);
 console.log(`Libraries: ${libraries.join(", ") || "none detected"}`);
 console.log(`Duplicated across pages: header ${duplicates.header.length ? "yes" : "no"}, nav ${duplicates.nav.length ? "yes" : "no"}, footer ${duplicates.footer.length ? "yes" : "no"}, <style> blocks ${duplicates.style.length ? "yes" : "no"}`);

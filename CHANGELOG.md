@@ -2,6 +2,18 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.4.3 (2026-11-10)
+
+**From Brandrup Rådgivning (client files in a `share/` folder, served by a local preview):**
+- Fix: `source-scan.mjs --exclude` stops with an error when the path doesn't exist, before anything is scanned. `--exclude share/_files` with the site in `original/www/` had matched nothing, which would have listed every client file name.
+- Fix: hosting checks find the web root (the shallowest folder with an index page, such as `www/`) instead of only the source root. New `hosting.webRoot`, `otherWebRoots` and `htaccessFiles`. It had reported no `.htaccess`, robots or 404 for `original/www/`.
+- Placeholder patterns catch "Denne side er en placeholder", "[Sagstitel]"-style bracketed labels, "Billede indsættes" / "Tekst følger", "kommer snart" and "pladsholder". The bare word "placeholder" only counts in visible page text, never in form attributes, CSS or JS.
+- web-vanilla `npm run serve` binds to 127.0.0.1. `python3 -m http.server` listens on every interface by default and ignores `.htaccess`, so a preview had published private files to the network. Same fix in the retro skill's test instructions.
+- `/audit`: local previews are always served from a copy without the private folders, bound to 127.0.0.1, never from the original folder; ask first, and check a running preview with `lsof`. `--exclude` paths are relative to the source folder, with an example.
+- User rules: new "Client data" section. Never serve, upload, commit or print client data; ask before starting a local server on a folder that may hold it.
+
+Tested on a mock: a wrong `--exclude` exits 1 with no output written; a correct one leaves no excluded names in the output; the web root is found as `www/` (and as `.` for a site at the root with a nested `blog/index.html`), with `.htaccess` rules parsed; all 5 Danish placeholder forms were found, and an input `placeholder` attribute, `::placeholder`, `[type="text"]`, a JS `placeholder` variable, a JS array and Markdown links were not; `npm run serve` listened on 127.0.0.1:8000 only and refused the LAN address. Mock deleted.
+
 ## 1.4.2 (2026-11-10)
 
 **From Brandrup Rådgivning:**

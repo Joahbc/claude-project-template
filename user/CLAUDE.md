@@ -16,6 +16,10 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 - Verify before saying something is done: run it, test it, look at it. Say what you checked.
 - If a rule in CLAUDE.md seems wrong for the situation, tell me instead of silently ignoring it
 
+## Client data
+- Never serve, upload, commit or print client data: documents, shared files, uploads, customer records, file names that identify a client or a case
+- Ask before starting any local server on a folder that may hold client data. Serve a copy without the private folders, bound to 127.0.0.1.
+
 ## Design
 - Avoid generic, templated "AI" looks. Intentional typography, spacing and motion.
 - Mobile matters as much as desktop. Check both.

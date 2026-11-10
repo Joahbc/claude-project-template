@@ -55,7 +55,7 @@ Keep it small. Three to six good changes beat fifteen.
 
 ## 5. Apply (only after approval)
 1. Make the approved edits in the template repo
-2. **Script changes must be tested before committing.** Run the script against a small local test page that reproduces the case (serve it with `python3 -m http.server`), check the output, then delete the test files. Text-only changes need `node --check` or a JSON parse at most.
+2. **Script changes must be tested before committing.** Run the script against a small local test page that reproduces the case (serve it with `python3 -m http.server --bind 127.0.0.1`), check the output, then delete the test files. Text-only changes need `node --check` or a JSON parse at most.
 3. Bump `VERSION`: patch for wording, minor for new rules, skills, script features or packs, major for workflow changes
 4. Add a `CHANGELOG.md` entry: version, date, each change, and the project it came from
 5. If `user/CLAUDE.md` or a skill changed, remind the user they're symlinked, so they're live immediately. A **new** skill needs `./install.sh` again.
