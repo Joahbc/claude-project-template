@@ -6,3 +6,5 @@
 - Preview with `npm run serve`, then check on a real phone on the same network
 - Tests: `npm test` runs `node --test tests/*.test.mjs`
 - Images: compressed, with width/height set and meaningful alt text
+- Content photos are `<img>` with `srcset`, `sizes` and alt text, never CSS `background-image`. The first visible image gets `fetchpriority="high"` and no `loading="lazy"`.
+- Pre-launch sweep: no placeholder text, empty sections or placeholder tiles. Run `/audit` on the preview and clear `placeholders` first.

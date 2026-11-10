@@ -20,6 +20,7 @@ claude-project-template/
 │   ├── shopify/          # Shopify themes and e-commerce
 │   └── coursework/       # school projects with strict rules
 ├── packs.json            # which skills, plugins and mode each pack uses
+├── references.md         # reference sites and the patterns each is good for
 ├── skills/
 │   ├── kickoff/          # /kickoff: scaffolds a new project from this template
 │   ├── audit/            # /audit: analyses an existing site before a redesign

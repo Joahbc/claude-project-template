@@ -2,6 +2,22 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.3.0 (2026-11-10)
+
+**From the Studio Sobra retro (audits of studio-sobra.vercel.app and studiosobra.com):**
+- `/audit` crawler records the font that actually renders next to the declared one, and warns when a declared web font falls back to a system font (`fonts.fallbackWarnings`). Found the broken Inter on the first site, which had needed a manual CDP check.
+- `/audit` crawler checks the mobile menu on the first page: opens, `aria-expanded`, closes on Escape, hidden links still reachable by Tab. Saves `<page>-mobile-menu-open.png`. It only presses the toggle button and Escape, never links, and skips quietly with no toggle. Escape failed on both sites and was checked by hand twice.
+- `/audit` crawler flags placeholder text (`placeholders`: "[to be added]", "coming soon", lorem ipsum, TBD, "soon to confirm"). The live "CVR: [to be added]" was the top v2 issue.
+- Fix: page text no longer falls back to script and style content, and includes text inside open shadow DOM (`shadowRoots`, `shadowFields`). The Shopify Forms page came out as code.
+- `/audit` crawler prints the setup command when Playwright is missing; setup step now says "whenever `scripts/node_modules` is missing", not only on a new machine (it broke after the skill moved into the template)
+- `/audit` rules for `--compare` and `--learn` together: one folder, full issues table, five questions or fewer
+- `/audit` self-check covers placeholders, font fallbacks and the menu check
+- shopify and web-vanilla packs: content photos are `<img>` with `srcset`/`sizes` and alt, never CSS backgrounds; pre-launch sweep for placeholders, empty collections and dateless events
+- New `references.md` at the template root, starting with studiosobra.com. `/audit --learn` proposes entries; `/retro` adds them.
+- Already covered in 1.2.0, not repeated: personal style rules never listed as findings, JSON-LD per page type, predictions marked Estimate, missing content must reach the issues table. Each came up a second time in this retro.
+
+Tested on a local test page (failed web font, broken and working menus, no menu, placeholders, script text in main, shadow DOM form) and on both real sites: cookie banner declined on studiosobra.com, 6 of 7 home background images unlabelled, body-scroll screenshots on the vercel site.
+
 ## 1.2.0 (2026-11-10)
 
 **From the Studio Sobra audit review:**

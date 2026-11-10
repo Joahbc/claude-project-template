@@ -1,15 +1,27 @@
 #!/usr/bin/env node
 // Crawls an existing website and saves what /audit needs to analyse it:
 // screenshots (desktop + mobile), page structure, content, styles and tech hints.
-// Read-only: it never submits forms, logs in or clicks buttons. The one exception
-// is a cookie banner's Decline/Reject button, so screenshots aren't covered by it
-// (pass --keep-cookie-banner to skip that).
+// Read-only: it never submits forms, logs in, follows a click or changes anything.
+// The only interactions are:
+// - a cookie banner's Decline/Reject button, so screenshots aren't covered by it
+//   (pass --keep-cookie-banner to skip that)
+// - on the first page, the mobile menu toggle (a button, never a link) and the
+//   Escape key, to check the menu opens, reports aria-expanded and closes again.
+//   Skipped quietly if no toggle is found.
 //
 // Usage: node crawl.mjs <url> [outDir] [--max-pages 20] [--keep-cookie-banner]
 
-import { chromium, devices } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+
+let chromium, devices;
+try {
+  ({ chromium, devices } = await import("playwright"));
+} catch {
+  const dir = path.dirname(new URL(import.meta.url).pathname);
+  console.error(`Playwright isn't installed next to this script. Run setup once:\n  cd "${dir}" && npm install && npx playwright install chromium`);
+  process.exit(1);
+}
 
 const args = process.argv.slice(2);
 const startArg = args[0];
@@ -164,7 +176,44 @@ async function fullShots(page, dir, base) {
 
 // Runs inside the page: collects structure, content and styles
 function extract() {
-  const text = (el) => (el?.innerText || el?.textContent || "").replace(/\s+/g, " ").trim();
+  // innerText is empty for hidden elements and for content rendered by apps after
+  // load; the textContent fallback must then skip scripts and styles, or page text
+  // ends up as code (seen with Shopify Forms).
+  const cleanTextContent = (el) => {
+    const c = el.cloneNode(true);
+    c.querySelectorAll?.("script, style, noscript, template").forEach((n) => n.remove());
+    return c.textContent || "";
+  };
+  const text = (el) => (el ? (el.innerText?.trim() ? el.innerText : cleanTextContent(el)) : "").replace(/\s+/g, " ").trim();
+
+  // Text inside open shadow roots (embedded apps, web components) is not in innerText
+  const shadowHosts = [...document.querySelectorAll("*")].filter((el) => el.shadowRoot);
+  const shadowText = shadowHosts
+    .map((h) => [...h.shadowRoot.children].map((c) => (c.innerText?.trim() ? c.innerText : cleanTextContent(c))).join(" "))
+    .join(" ").replace(/\s+/g, " ").trim();
+  const shadowFields = shadowHosts.reduce((n, h) => n + h.shadowRoot.querySelectorAll("input:not([type=hidden]), select, textarea").length, 0);
+
+  // Placeholder and unfinished content, anywhere in the visible text
+  const PLACEHOLDERS = [
+    /\[[^\]]{0,40}\b(to be added|tbd|tba|todo|insert|placeholder|add here|missing)\b[^\]]{0,40}\]/gi,
+    /\blorem ipsum\b/gi,
+    /\bcoming soon\b/gi,
+    /\b(soon to (be )?confirm(ed)?|to be (added|confirmed|announced))\b/gi,
+    /\b(TBD|TBA|TODO|FIXME)\b/g,
+    /\byour (text|title|heading|content) here\b/gi,
+  ];
+  const visibleText = `${text(document.body)} ${shadowText}`;
+  const placeholders = [];
+  const taken = [];
+  for (const re of PLACEHOLDERS) {
+    for (const m of visibleText.matchAll(re)) {
+      if (placeholders.length >= 15) break;
+      const end = m.index + m[0].length;
+      if (taken.some(([a, b]) => m.index < b && end > a)) continue; // already caught by an earlier pattern
+      taken.push([m.index, end]);
+      placeholders.push({ match: m[0], context: visibleText.slice(Math.max(0, m.index - 40), m.index + m[0].length + 40).trim() });
+    }
+  }
   const meta = (sel) => document.querySelector(sel)?.getAttribute("content") || null;
 
   const links = [...document.querySelectorAll("a[href]")].map((a) => ({
@@ -328,7 +377,126 @@ function extract() {
     scrollsInside: window.__auditScroller && window.__auditScroller() !== (document.scrollingElement || document.documentElement)
       ? (window.__auditScroller().tagName.toLowerCase() + (window.__auditScroller().id ? "#" + window.__auditScroller().id : ""))
       : null,
-    mainText: text(document.querySelector("main") || document.body).slice(0, 20000),
+    placeholders,
+    shadowRoots: shadowHosts.length,
+    shadowFields,
+    mainText: `${text(document.querySelector("main") || document.body)}${shadowText ? `\n\n(Inside shadow DOM) ${shadowText}` : ""}`.slice(0, 20000),
+  };
+}
+
+// Marks one element per role that has its own text, so the rendered font can be
+// read for it over CDP. Returns what the CSS declares for each.
+function markFontSamples() {
+  const roles = { body: "body p, body li, body span", h1: "h1", h2: "h2", h3: "h3", nav: "nav a, header a", button: "button, .btn, [class*=button]" };
+  const out = {};
+  for (const [role, sel] of Object.entries(roles)) {
+    const el = [...document.querySelectorAll(sel)].find((e) => {
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    });
+    if (!el) continue;
+    el.setAttribute("data-audit-font", role);
+    out[role] = getComputedStyle(el).fontFamily;
+  }
+  return out;
+}
+
+const GENERIC_FONTS = /^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-serif|ui-sans-serif|ui-monospace|ui-rounded|-apple-system|blinkmacsystemfont|inherit|initial)$/i;
+
+// Which font actually renders versus what the CSS asks for. A declared web font
+// that silently falls back to a system font is invisible in computed styles.
+async function renderedFonts(page) {
+  try {
+    const declared = await page.evaluate(markFontSamples);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("DOM.enable");
+    await cdp.send("CSS.enable");
+    const { root } = await cdp.send("DOM.getDocument", { depth: -1 });
+    const samples = [];
+    for (const [role, css] of Object.entries(declared)) {
+      const { nodeId } = await cdp.send("DOM.querySelector", { nodeId: root.nodeId, selector: `[data-audit-font="${role}"]` });
+      if (!nodeId) continue;
+      const { fonts } = await cdp.send("CSS.getPlatformFontsForNode", { nodeId });
+      const first = css.split(",")[0].replace(/["']/g, "").trim();
+      const rendered = fonts.map((f) => ({ family: f.familyName, webFont: !!f.isCustomFont, glyphs: f.glyphCount }));
+      const fellBack = !GENERIC_FONTS.test(first) && rendered.length > 0 &&
+        rendered.every((f) => !f.webFont && f.family.toLowerCase() !== first.toLowerCase());
+      samples.push({ role, declared: css, rendered, fellBack });
+    }
+    await cdp.detach().catch(() => {});
+    await page.evaluate(() => document.querySelectorAll("[data-audit-font]").forEach((e) => e.removeAttribute("data-audit-font")));
+    const fontFaces = await page.evaluate(() => [...new Set([...document.fonts].map((f) => `${f.family.replace(/["']/g, "")}: ${f.status}`))]);
+    return { samples, fontFaces, fallbackWarnings: samples.filter((s) => s.fellBack).map((s) => `${s.role}: CSS asks for ${s.declared.split(",")[0]}, renders ${s.rendered.map((f) => f.family).join(" + ")}`) };
+  } catch (e) {
+    return { error: e.message.split("\n")[0] };
+  }
+}
+
+// Mobile menu check, first page only. Presses the toggle (a button, never a link)
+// and Escape, nothing else. Skips quietly if there's no toggle.
+async function checkMobileMenu(page, shotPath) {
+  const hiddenFocusable = () => page.evaluate(() => {
+    const isHidden = (el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return false; // display:none, not focusable anyway
+      if (r.right <= 0 || r.left >= innerWidth || r.bottom <= 0 && getComputedStyle(el).position === "fixed") return true;
+      for (let n = el; n && n !== document.body; n = n.parentElement) {
+        const s = getComputedStyle(n);
+        if (s.opacity === "0" || s.visibility === "hidden") return true;
+      }
+      return false;
+    };
+    return [...document.querySelectorAll("a[href], button")]
+      .filter((el) => el.tabIndex >= 0 && !el.closest("[inert]") && !/skip/i.test(el.textContent) && isHidden(el))
+      .map((el) => (el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 30));
+  });
+  const visibleLinks = () => page.evaluate(() => [...document.querySelectorAll("a[href]")].filter((a) => {
+    const r = a.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= innerWidth && r.top < innerHeight && r.bottom > 0 && getComputedStyle(a).visibility !== "hidden";
+  }).length);
+
+  const handle = await page.evaluateHandle(() => {
+    const cands = [...document.querySelectorAll("header button, nav button, header [role=button], button[aria-controls], button[aria-expanded], header summary")];
+    return cands.find((b) => {
+      const r = b.getBoundingClientRect();
+      if (!r.width || !r.height || r.top > 200 || b.closest("form")) return false;
+      const label = `${b.getAttribute("aria-label") || ""} ${b.textContent || ""} ${b.className}`.toLowerCase();
+      return /menu|nav|burger|hamburger|toggle|drawer|☰/.test(label) || (!b.textContent.trim() && b.querySelector("svg"));
+    }) || null;
+  });
+  const toggle = handle.asElement();
+  if (!toggle) return { found: false };
+
+  const urlBefore = page.url();
+  const describe = () => toggle.evaluate((b) => ({ ariaExpanded: b.getAttribute("aria-expanded"), label: b.getAttribute("aria-label") || b.textContent.trim().slice(0, 30) || null }));
+  const before = await describe();
+  const hiddenWhenClosed = await hiddenFocusable();
+  const linksClosed = await visibleLinks();
+
+  await toggle.click({ timeout: 2000 }).catch(() => {});
+  await sleep(700);
+  if (page.url() !== urlBefore) return { found: true, error: "toggle navigated away, check skipped" };
+  const open = await describe();
+  const linksOpen = await visibleLinks();
+  await page.screenshot({ path: shotPath }).catch(() => {});
+
+  await page.keyboard.press("Escape");
+  await sleep(500);
+  const afterEsc = await describe();
+  const linksAfterEsc = await visibleLinks();
+  const closedByEscape = (open.ariaExpanded === "true" && afterEsc.ariaExpanded === "false") ||
+    (open.ariaExpanded === null && linksOpen > linksClosed && linksAfterEsc <= linksClosed);
+  if (!closedByEscape) { await toggle.click({ timeout: 2000 }).catch(() => {}); await sleep(400); }
+
+  return {
+    found: true,
+    label: before.label,
+    opens: linksOpen > linksClosed || open.ariaExpanded === "true",
+    ariaExpanded: { closed: before.ariaExpanded, open: open.ariaExpanded, afterEscape: afterEsc.ariaExpanded },
+    reportsState: before.ariaExpanded === "false" && open.ariaExpanded === "true",
+    closedByEscape,
+    hiddenFocusableWhenClosed: hiddenWhenClosed.length,
+    hiddenFocusableSamples: hiddenWhenClosed.slice(0, 8),
   };
 }
 
@@ -388,6 +556,7 @@ while (queue.length && pages.length < maxPages) {
   }
 
   const data = await page.evaluate(extract);
+  const fonts = await renderedFonts(page);
   const transferKb = await page.evaluate(() =>
     Math.round(performance.getEntriesByType("resource").reduce((s, e) => s + (e.transferSize || 0), 0) / 1024)
   );
@@ -403,6 +572,9 @@ while (queue.length && pages.length < maxPages) {
   const mobileOverflow = await mpage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   await mpage.screenshot({ path: path.join(shotsDir, `${slug}-mobile-fold.png`) });
   const mobileShots = await fullShots(mpage, shotsDir, `${slug}-mobile`);
+  const mobileMenu = pages.length === 0
+    ? await checkMobileMenu(mpage, path.join(shotsDir, `${slug}-mobile-menu-open.png`)).catch((e) => ({ found: false, error: e.message.split("\n")[0] }))
+    : undefined;
   await mpage.close();
 
   await writeFile(
@@ -415,6 +587,8 @@ while (queue.length && pages.length < maxPages) {
     url, slug, status, loadMs, transferKb, mobileOverflow, consoleErrors, failedRequests,
     screenshots: { desktop: desktopShots, mobile: mobileShots },
     cookieBanner,
+    fonts,
+    ...(mobileMenu ? { mobileMenu } : {}),
     server: headers["server"] || null, poweredBy: headers["x-powered-by"] || null,
     vercel: !!headers["x-vercel-id"],
     ...rest,

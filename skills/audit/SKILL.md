@@ -12,6 +12,7 @@ The audit files are **internal working notes**: direct and evidence-based. Anyth
 ## Rules
 - **Read-only.** Never submit forms, log in, enter checkout or change anything on the site. Allowed exceptions:
   - Declining a cookie banner (the crawler does this automatically; it never accepts)
+  - Pressing the mobile menu toggle and the Escape key (the crawler does this on the first page). Only the toggle button, never links or anything else. If there's no toggle, skip it.
   - Adding a product to the cart to inspect cart options (delivery date, time slots, notes, upsells), then emptying the cart again. Stop at the cart page.
 - Only audit a site the user is redesigning or has permission to analyse. If unsure, ask.
 - Keep the crawl polite: the script waits between pages and stops at `--max-pages`.
@@ -27,7 +28,8 @@ Skip anything the user already said.
 
 Status sets the tone: on a pre-launch or in-progress site, placeholders and empty sections are "unfinished" (Medium) rather than High, unless they'd break trust if launched as is. When someone else built it, keep findings factual and never personal.
 
-## 1. Setup (first run on a machine only)
+## 1. Setup (whenever `scripts/node_modules` is missing)
+Needed on a new machine, and again after the skill folder moves (for example into the template repo). If you're unsure, check first: `ls ~/.claude/skills/audit/scripts/node_modules`. The crawler also prints this command when Playwright is missing.
 ```bash
 cd ~/.claude/skills/audit/scripts && npm install && npx playwright install chromium
 ```
@@ -40,8 +42,14 @@ node ~/.claude/skills/audit/scripts/crawl.mjs <url> docs/audit --max-pages 20
 It declines cookie banners automatically (`cookieBanner` in the data says how). Add `--keep-cookie-banner` to keep the banner in the screenshots, for example to judge the banner itself.
 
 It writes to `docs/audit/`:
-- `audit-data.json`: per page title, meta, headings, links, one-page sections (`#anchors`), images and alt text, **CSS background images and whether they're labelled**, **JSON-LD types**, forms and fields, CTAs, typography samples, top colors, fonts and font sizes, CSS variables, tech hints (Shopify and theme name, Next.js, WordPress, Webflow and others), analytics, load time, page weight, console errors, mobile overflow, cookie banner. Site-wide: broken links, external links, contact links, robots.txt and sitemap.
-- `screenshots/`: `<page>-desktop-fold` and `-mobile-fold`, plus either `-full` (one full-page image) or `-scroll-01`, `-02` and so on (viewport shots, when the site scrolls inside `body` or a wrapper; `scrollsInside` says which element)
+- `audit-data.json`: per page title, meta, headings, links, one-page sections (`#anchors`), images and alt text, **CSS background images and whether they're labelled**, **JSON-LD types**, forms and fields, CTAs, typography samples, top colors, fonts and font sizes, CSS variables, tech hints (Shopify and theme name, Next.js, WordPress, Webflow and others), analytics, load time, page weight, console errors, mobile overflow, cookie banner. Also:
+  - `fonts`: the font that **actually renders** for body, headings, nav and buttons next to what the CSS declares. `fallbackWarnings` lists declared web fonts that never load and fall back to a system font.
+  - `placeholders`: unfinished text such as "[to be added]", "coming soon", "lorem ipsum", "TBD", "soon to confirm", with context
+  - `mobileMenu` (first page only): whether the toggle opens the menu, reports `aria-expanded`, closes on Escape, and how many hidden menu links Tab still reaches when it's closed
+  - `shadowRoots`, `shadowFields`: content and form fields inside shadow DOM (embedded apps), whose text is added to `content/`
+  
+  Site-wide: broken links, external links, contact links, robots.txt and sitemap.
+- `screenshots/`: `<page>-desktop-fold` and `-mobile-fold`, plus either `-full` (one full-page image) or `-scroll-01`, `-02` and so on (viewport shots, when the site scrolls inside `body` or a wrapper; `scrollsInside` says which element). The first page also gets `<page>-mobile-menu-open.png` when a menu toggle was found.
 - `content/`: the text of each page as markdown, reusable for content migration
 
 If it reports pages "not crawled", ask whether to raise `--max-pages`.
@@ -92,6 +100,7 @@ Go through this list and fix what fails:
 - Predictions are marked **Estimate:** and don't promise exact numbers that depend on things outside the site's control
 - No personal style rules are listed as findings
 - Structured data was checked on more than the homepage
+- Every entry in `placeholders`, `fonts.fallbackWarnings` and a failed `mobileMenu` check is either in Issues (13) or explained as harmless
 - Screenshot links point to files that exist
 
 ## 7. Connect it to the project
@@ -119,6 +128,8 @@ Use when a site has changed (a new version launched, or your redesign went live)
 
 When comparing your own redesign after launch, this file is the before/after section of the case study.
 
+**`--compare` and `--learn` together:** everything goes in the new folder (`docs/audit-<short-name>/`), including `learnings.md`. Keep the full issues table, because the comparison needs it. Keep client questions to five or fewer.
+
 ## Learn mode: `/audit <url> --learn`
 Use to study a well-made site for inspiration rather than to redesign it. Skip the issues table and client questions. Instead, write `learnings.md` in the audit folder:
 - How it's built: platform, theme or framework, notable libraries, how sections and components are structured. Mark anything not verified.
@@ -126,3 +137,4 @@ Use to study a well-made site for inspiration rather than to redesign it. Skip t
 - UX patterns: navigation, product and pricing presentation, inquiry or checkout flow
 - For each, one line on where it could apply in future projects
 - **Suggestions for the template:** pack rules, reference sites or audit improvements to propose at the next `/retro`
+- **Proposed for references.md:** one entry for the site in the format of `references.md` at the template root (path in `~/.claude/project-template-path`): URL, type of site, and the patterns it's good for. Propose it in the report; it's added at the next `/retro`, never directly.

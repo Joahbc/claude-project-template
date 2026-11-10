@@ -19,9 +19,9 @@ Read, when present:
 - `git log` since kickoff, looking for reverts, repeated fixes and long gaps
 - `skills-lock.json`, and which skills were actually used during the project if that can be seen
 - `docs/brief.md` done criteria: which were met?
-- `docs/audit*/`: method notes, workarounds Claude had to use, and "Suggestions for the template" in `learnings.md`
+- `docs/audit*/`: method notes, workarounds Claude had to use, and "Suggestions for the template" and "Proposed for references.md" in `learnings.md`
 
-Then read the template (path in `~/.claude/project-template-path`): `VERSION`, `CHANGELOG.md`, `user/CLAUDE.md`, `base/`, the project's pack, `packs.json`, and the `SKILL.md` of every skill in `skills/` that was used.
+Then read the template (path in `~/.claude/project-template-path`): `VERSION`, `CHANGELOG.md`, `user/CLAUDE.md`, `references.md`, `base/`, the project's pack, `packs.json`, and the `SKILL.md` of every skill in `skills/` that was used.
 
 If the project started from an older template version, note what changed since then.
 
@@ -44,6 +44,7 @@ Sort every lesson into one of these, and present them as a short list:
 | Keep in project | this project's CLAUDE.md | helped once, too specific |
 | Promote to template | `base/` or `packs/<pack>/` or `packs.json` | helped in 2+ projects, or clearly reusable for this type |
 | Promote to global | `user/CLAUDE.md` | applies to everything Joah does |
+| Add a reference | `references.md` | a studied site has patterns worth reusing |
 | Improve a skill | `skills/<name>/SKILL.md` or its `scripts/` | a skill's instructions were unclear, missed something, or Claude needed a workaround |
 | Prune | remove from template | a rule or skill that didn't help, or caused friction |
 | New pack or skill | `packs/<new>/` or `skills/<new>/` | the project didn't fit any pack, or a procedure repeated that deserves its own skill |

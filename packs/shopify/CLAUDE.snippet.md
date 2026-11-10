@@ -7,3 +7,5 @@
 - Danish and English via theme translations (`locales/`), not duplicated templates
 - Flower shop and local business checks: pickup vs delivery, delivery dates, product variants, and a separate inquiry flow for events and B2B
 - Keep a "Client handover" section in PROCESS.md: how they edit content, add products and get help
+- Content photos (products, heroes, projects) are `<img>` via `image_url` and `image_tag` with `widths`, `sizes` and alt text, never CSS `background-image`. The first visible image gets `fetchpriority="high"` and no lazy loading. Decorative backgrounds only get `aria-hidden`.
+- Pre-launch sweep before the theme goes live: no "[to be added]", "coming soon" or lorem text, no empty collections in the nav, no placeholder tiles, no events without a date or sign-up. Run `/audit` on the dev theme preview and clear `placeholders` first.
