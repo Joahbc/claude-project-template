@@ -13,9 +13,7 @@
         { "source": "greensock/gsap-skills", "skill": "gsap-scrolltrigger" },
         { "source": "greensock/gsap-skills", "skill": "gsap-performance" },
         { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
-        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" },
-        { "source": "Leonxlnx/taste-skill", "skill": "minimalist-ui" },
-        { "source": "Leonxlnx/taste-skill", "skill": "redesign-existing-projects" }
+        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" }
       ],
       "plugins": []
     },
@@ -25,9 +23,7 @@
       "skills": [
         { "source": "shopify/shopify-ai-toolkit", "skill": "shopify-liquid" },
         { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
-        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" },
-        { "source": "Leonxlnx/taste-skill", "skill": "minimalist-ui" },
-        { "source": "Leonxlnx/taste-skill", "skill": "redesign-existing-projects" }
+        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" }
       ],
       "plugins": [
         "liquid-lsp@claude-plugins-official"

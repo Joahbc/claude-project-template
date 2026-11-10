@@ -34,12 +34,13 @@ Don't ask anything the user already answered in their message.
 6. Write a first draft of `docs/brief.md` from the answers. Mark guesses with `TODO:`.
 
 ## 3. Install
-1. For each skill in the pack: `npx -y skills add <source> --skill <skill> --agent claude-code`. If one fails, list the repo's skills, pick the closest match, and tell the user so they can update `packs.json`.
+1. For each skill in the pack, run one `npx -y skills add <source> --skill <skill> --agent claude-code` command as its own Bash call. Never wrap them in a shell loop: loops break under zsh. If one fails, list the repo's skills, pick the closest match, and tell the user so they can update `packs.json`.
 2. For each plugin in the pack and in `globalPlugins`: check whether it's installed. If not, tell the user the exact `/plugin install ...` command to run (Claude can't run slash commands).
 3. Mention anything under `requires` that the user needs to set up.
 
 ## 4. Commit
 - `git init` if needed, then commit everything: `chore: kickoff from template v<version> (<pack>, <mode>)` with a Co-Authored-By line
+- Installed skills (`.claude/skills/`, `.agents/skills/`) are gitignored and not committed, but `skills-lock.json` is, so they can be restored
 - Add a first entry under Decisions in PROCESS.md: pack, mode and why
 
 ## 5. Report

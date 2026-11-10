@@ -36,6 +36,8 @@ claude-project-template/
 
 Make an empty folder, open Claude Code in it and run `/kickoff`. It asks a few questions, copies the base, adds the right pack, installs the pack's skills, fills in CLAUDE.md and the brief, and makes the first commit.
 
+On a new machine or fresh clone, reinstall the pack's skills with the `npx` commands from `packs.json`.
+
 ## The workflow
 
 | Step | What happens | Output |
