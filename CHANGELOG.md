@@ -2,6 +2,15 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.1.0 (2026-11-10)
+
+**New:**
+- `/audit <url>` skill for redesigns: read-only crawl with Playwright (structure, content, styles, tech hints, desktop and mobile screenshots), Lighthouse scores, and a written `docs/audit/audit.md` with Keep / Change / Add and an issues table
+- `/kickoff` asks whether the project is a redesign and, if so, points to `/audit <url>` before the brief
+- `docs/brief.md` has a "Current site" section for redesigns
+- Root `.gitignore` so the audit script's `node_modules/` is never committed
+- README: audit in the folder tree and as workflow step 0.5; re-run `install.sh` after adding a skill
+
 ## 1.0.2 (2026-11-10)
 
 **From kickoff-test:**

@@ -6,6 +6,9 @@ What should be true when this is done?
 ## Audience
 Who uses it, and what do they come for?
 
+## Current site
+<!-- Redesigns only: URL, link to docs/audit/audit.md, five-line summary. Delete this section for new builds. -->
+
 ## Scope
 - In:
 - Out:

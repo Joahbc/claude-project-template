@@ -1,0 +1,9 @@
+{
+  "name": "audit-crawler",
+  "private": true,
+  "type": "module",
+  "description": "Crawler used by the /audit skill",
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

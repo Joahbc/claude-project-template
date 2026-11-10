@@ -22,6 +22,7 @@ claude-project-template/
 ├── packs.json            # which skills, plugins and mode each pack uses
 ├── skills/
 │   ├── kickoff/          # /kickoff: scaffolds a new project from this template
+│   ├── audit/            # /audit: analyses an existing site before a redesign
 │   └── retro/            # /retro: closes a project and improves this template
 └── install.sh            # links the skills and user rules into ~/.claude
 ```
@@ -31,6 +32,8 @@ claude-project-template/
 1. Clone this repo somewhere permanent, e.g. `~/Developer/claude-project-template`
 2. Run `./install.sh`
 3. Make sure Superpowers is installed: `/plugin install superpowers@claude-plugins-official` inside Claude Code
+
+After adding a new skill to `skills/`, re-run `./install.sh` so it gets linked into `~/.claude/skills/`.
 
 ## Starting a project
 
@@ -43,6 +46,7 @@ On a new machine or fresh clone, reinstall the pack's skills with the `npx` comm
 | Step | What happens | Output |
 |---|---|---|
 | 0. Kickoff | `/kickoff`, pick pack and mode | CLAUDE.md, brief.md, first commit |
+| 0.5. Audit (redesigns only) | `/audit <url>`: crawl, screenshots, Lighthouse, findings | docs/audit/ |
 | 1. Brief | Lock goal, audience, done criteria | docs/brief.md |
 | 2. Spec and plan | Superpowers brainstorm, spec, plan (Guided) or my own step list (Directed) | docs/superpowers/ |
 | 3. Build | Small steps, commit after each, test locally and on phone | commits |
