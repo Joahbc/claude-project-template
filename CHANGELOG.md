@@ -2,6 +2,14 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.1.1 (2026-11-10)
+
+**From the Studio Sobra audit:**
+- Fix: the audit crawler finds the real scroll container on sites that scroll inside `body` or a wrapper, and takes scroll-by-scroll viewport screenshots there instead of a blank full-page shot. `scrollsInside` in the data says which element scrolls.
+- Fix: `/audit` step 6 has a fallback for folders with no project yet: the audit stays in `docs/audit/`, with no `git init` and no new brief or PROCESS.md
+- New: `--compare <folder>` mode, which audits a changed site into its own folder and writes `comparison.md` against the earlier audit
+- New: `--learn` mode, which studies a well-made site for inspiration and writes `learnings.md`
+
 ## 1.1.0 (2026-11-10)
 
 **New:**

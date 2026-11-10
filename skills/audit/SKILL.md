@@ -26,7 +26,7 @@ node ~/.claude/skills/audit/scripts/crawl.mjs <url> docs/audit --max-pages 20
 ```
 It writes to `docs/audit/`:
 - `audit-data.json`: per page title, meta, headings, links, one-page sections (`#anchors`), images and alt text, forms and fields, CTAs, typography samples, top colors, fonts and font sizes, CSS variables, tech hints (Shopify and theme name, Next.js, WordPress, Webflow and others), analytics, load time, page weight, console errors, mobile overflow. Site-wide: broken links, external links, contact links, robots.txt and sitemap.
-- `screenshots/`: `<page>-desktop-fold`, `-desktop-full`, `-mobile-fold` and `-mobile-full` PNGs
+- `screenshots/`: `<page>-desktop-fold` and `-mobile-fold`, plus either `-full` (one full-page image) or `-scroll-NN` (viewport shots, when the site scrolls inside `body` or a wrapper instead of the window; `scrollsInside` in the data says which element)
 - `content/`: the text of each page as markdown, reusable for content migration
 
 If it reports pages "not crawled", ask whether to raise `--max-pages`.
@@ -63,11 +63,33 @@ Use these sections, short and scannable, with screenshot links like `![](screens
 Also save `docs/audit/current-tokens.md`: the current palette, type and spacing as a reference, clearly labelled as the *old* system.
 
 ## 6. Connect it to the project
+If the folder has no `docs/brief.md` or `PROCESS.md` (no `/kickoff` yet), don't create them or run `git init`. Leave the audit in `docs/audit/`, say so in the report, and note that `/kickoff` will link it later. Otherwise:
 - `docs/brief.md`: fill in "Current site" with a five-line summary and a link to the audit. Add the client questions under "Open questions".
 - `PROCESS.md`: a Decisions entry ("Audited <url> before redesign") and, under Case study notes, a link to the before screenshots.
 - Commit: `docs: audit of <domain>` with the usual Co-Authored-By line.
 
 ## 7. Report
 In chat: the top five findings, the three things worth keeping, and the client questions. Then stop. Don't start the redesign or the brainstorm until the user says so.
+
+## Compare mode: `/audit <url> --compare <folder>`
+Use when a site has changed (a new version launched, or your redesign went live) or to measure one site against another.
+1. Crawl into its own folder: `docs/audit-<short-name>/` (for example `docs/audit-v2/`), so the earlier audit is kept
+2. Run steps 3 to 5 as usual
+3. Write `docs/audit-<short-name>/comparison.md` against the earlier `audit.md`:
+   - **Scoreboard:** Lighthouse scores, page count, page weight and load time side by side
+   - **Fixed:** each earlier issue that's now solved, with evidence
+   - **Still open:** earlier issues that remain
+   - **New issues:** problems the new version introduced
+   - **Kept or lost:** what happened to the "worth keeping" items
+   - **Verdict:** in three lines, how much better it is and where the real remaining opportunities are. Be honest if little is left to improve.
+
+## Learn mode: `/audit <url> --learn`
+Use to study a well-made site for inspiration rather than to redesign it. Skip the issues table and client questions. Instead, write `docs/audit/learnings.md`:
+- How it's built: platform, theme or framework, notable libraries, how sections and components are structured
+- Design moves worth borrowing: layout, type pairing, color use, imagery, motion, microcopy
+- UX patterns: navigation, product and pricing presentation, inquiry or checkout flow
+- For each, one line on where it could apply in future projects
+
+When a learning is useful across projects, suggest adding it to the template at the next `/retro` (for example a pack rule or a reference site).
 
 Offer, in one line, to write a short client-friendly version of the summary (in Danish, English or Spanish) that the user can share.

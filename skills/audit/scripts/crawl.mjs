@@ -54,15 +54,62 @@ async function load(page, url) {
   }
   // Scroll through the page so lazy-loaded images and scroll animations trigger
   await page.evaluate(async () => {
+    const el = window.__auditScroller();
     const step = window.innerHeight * 0.8;
-    for (let y = 0; y < document.body.scrollHeight; y += step) {
-      window.scrollTo(0, y);
+    for (let y = 0; y < el.scrollHeight; y += step) {
+      el.scrollTo(0, y);
       await new Promise((r) => setTimeout(r, 150));
     }
-    window.scrollTo(0, 0);
+    el.scrollTo(0, 0);
   }).catch(() => {});
   await sleep(800);
   return response;
+}
+
+// Finds what actually scrolls. Some sites scroll inside body, main or a wrapper
+// div instead of the window, which makes Playwright's fullPage screenshots blank.
+const FIND_SCROLLER = () => {
+  window.__auditScroller = () => {
+    const root = document.scrollingElement || document.documentElement;
+    if (root.scrollHeight > window.innerHeight + 50) {
+      const s = getComputedStyle(root);
+      if (s.overflowY !== "hidden") return root;
+    }
+    const candidates = [document.body, ...document.querySelectorAll("body > *, main, [data-scroll-container], #__next, #root")];
+    let best = null;
+    for (const c of candidates) {
+      const s = getComputedStyle(c);
+      if (/(auto|scroll)/.test(s.overflowY) && c.scrollHeight > c.clientHeight + 50) {
+        if (!best || c.scrollHeight > best.scrollHeight) best = c;
+      }
+    }
+    return best || root;
+  };
+};
+
+// Full-page screenshot when the window scrolls; otherwise scroll-by-scroll
+// viewport screenshots of the real scroll container (max 15).
+async function fullShots(page, dir, base) {
+  const windowScrolls = await page.evaluate(() => {
+    const el = window.__auditScroller();
+    return el === (document.scrollingElement || document.documentElement);
+  });
+  if (windowScrolls) {
+    await page.screenshot({ path: path.join(dir, `${base}-full.png`), fullPage: true });
+    return { mode: "fullPage", shots: 1 };
+  }
+  const { height, view } = await page.evaluate(() => {
+    const el = window.__auditScroller();
+    return { height: el.scrollHeight, view: el.clientHeight || window.innerHeight };
+  });
+  const steps = Math.min(15, Math.ceil(height / view));
+  for (let i = 0; i < steps; i++) {
+    await page.evaluate((y) => window.__auditScroller().scrollTo(0, y), i * view);
+    await sleep(500); // let scroll animations settle
+    await page.screenshot({ path: path.join(dir, `${base}-scroll-${String(i + 1).padStart(2, "0")}.png`) });
+  }
+  await page.evaluate(() => window.__auditScroller().scrollTo(0, 0));
+  return { mode: "scroll-by-scroll", shots: steps };
 }
 
 // Runs inside the page: collects structure, content and styles
@@ -197,7 +244,10 @@ function extract() {
     topFontSizes: top(fontSizeCount, 10),
     cssVars,
     tech,
-    pageHeight: document.body.scrollHeight,
+    pageHeight: window.__auditScroller ? window.__auditScroller().scrollHeight : document.body.scrollHeight,
+    scrollsInside: window.__auditScroller && window.__auditScroller() !== (document.scrollingElement || document.documentElement)
+      ? (window.__auditScroller().tagName.toLowerCase() + (window.__auditScroller().id ? "#" + window.__auditScroller().id : ""))
+      : null,
     mainText: text(document.querySelector("main") || document.body).slice(0, 20000),
   };
 }
@@ -214,6 +264,8 @@ async function fetchText(request, url) {
 const browser = await chromium.launch();
 const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const mobile = await browser.newContext({ ...devices["iPhone 13"] });
+await desktop.addInitScript(FIND_SCROLLER);
+await mobile.addInitScript(FIND_SCROLLER);
 
 await mkdir(path.join(outDir, "screenshots"), { recursive: true });
 await mkdir(path.join(outDir, "content"), { recursive: true });
@@ -262,14 +314,15 @@ while (queue.length && pages.length < maxPages) {
   const headers = response.headers();
 
   await page.screenshot({ path: path.join(outDir, "screenshots", `${slug}-desktop-fold.png`) });
-  await page.screenshot({ path: path.join(outDir, "screenshots", `${slug}-desktop-full.png`), fullPage: true });
+  const shotsDir = path.join(outDir, "screenshots");
+  const desktopShots = await fullShots(page, shotsDir, `${slug}-desktop`);
   await page.close();
 
   const mpage = await mobile.newPage();
   await load(mpage, url);
   const mobileOverflow = await mpage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
-  await mpage.screenshot({ path: path.join(outDir, "screenshots", `${slug}-mobile-fold.png`) });
-  await mpage.screenshot({ path: path.join(outDir, "screenshots", `${slug}-mobile-full.png`), fullPage: true });
+  await mpage.screenshot({ path: path.join(shotsDir, `${slug}-mobile-fold.png`) });
+  const mobileShots = await fullShots(mpage, shotsDir, `${slug}-mobile`);
   await mpage.close();
 
   await writeFile(
@@ -280,6 +333,7 @@ while (queue.length && pages.length < maxPages) {
   const { mainText, ...rest } = data;
   pages.push({
     url, slug, status, loadMs, transferKb, mobileOverflow, consoleErrors, failedRequests,
+    screenshots: { desktop: desktopShots, mobile: mobileShots },
     server: headers["server"] || null, poweredBy: headers["x-powered-by"] || null,
     vercel: !!headers["x-vercel-id"],
     ...rest,
