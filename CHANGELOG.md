@@ -2,6 +2,11 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.4.1 (2026-11-10)
+
+**From Brandrup Rådgivning:**
+- Fix: `source-scan.mjs` masks key-like tokens in placeholder context lines (20+ characters of letters, digits, `_` or `-`, mixing letters and digits; first 4 kept, then "..."), so a secret in a format the patterns don't know can't leak. Tested on a mock: an unknown-format key next to a TODO was masked; Danish text and normal URLs were not. A long URL slug that mixes letters and digits is masked too, which errs on the safe side.
+
 ## 1.4.0 (2026-11-10)
 
 **From Brandrup Rådgivning:**

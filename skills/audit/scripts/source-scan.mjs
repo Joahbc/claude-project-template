@@ -291,12 +291,16 @@ const PLACEHOLDERS = /lorem ipsum|\bTODO\b|\bFIXME\b|\[to be added\]|\[insert[^\
 const placeholders = [];
 // Never echo a line that may hold a secret: its context is replaced, not printed
 const secretLines = new Set(secrets.map((s) => `${s.file}:${s.line}`));
+// Also mask key-like tokens the secret patterns don't know: 20+ chars of
+// letters, digits, _ or -, mixing letters and digits
+const maskTokens = (line) =>
+  line.replace(/[A-Za-z0-9_-]{20,}/g, (t) => (/[A-Za-z]/.test(t) && /\d/.test(t) ? `${t.slice(0, 4)}...` : t));
 for (const f of allText.filter((x) => [".html", ".htm", ".php", ".js", ".css", ".json", ".md"].includes(x.ext))) {
   for (const m of f.text.matchAll(PLACEHOLDERS)) {
     const line = f.text.slice(0, m.index).split("\n").length;
     const lineText = secretLines.has(`${f.path}:${line}`)
       ? "(hidden: possible secret on this line)"
-      : norm(f.text.split("\n")[line - 1] || "").slice(0, 120);
+      : maskTokens(norm(f.text.split("\n")[line - 1] || "")).slice(0, 120);
     placeholders.push({ file: f.path, line, match: m[0], context: lineText });
   }
 }
