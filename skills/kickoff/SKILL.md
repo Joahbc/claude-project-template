@@ -21,6 +21,7 @@ Ask these together, with sensible defaults shown:
 5. Deploy target, if known
 6. Anything fixed: deadline, people involved, constraints, school rules
 7. Is this a redesign of an existing site? If so, its URL.
+8. Do you have the source code? If so, copy it into `original/` and commit it untouched in its own commit before any other changes, then suggest `/audit <url> --source original/`.
 
 For the coursework pack, also ask for course name, deadline, hand-in format and allowed exceptions.
 
@@ -48,6 +49,6 @@ Don't ask anything the user already answered in their message.
 One short summary: what was created, what's still `TODO:`, and the next step:
 - Guided: "Next: fill in the brief together, then start the Superpowers brainstorm"
 - Directed: "Next: give me step 1"
-- Redesign: the next step is `/audit <url>` before the brief, in either mode
+- Redesign: the next step is `/audit <url>` before the brief, in either mode, with `--source original/` when the source code was given
 
 Don't start the brief or any build work until the user says so.

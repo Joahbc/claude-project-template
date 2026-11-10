@@ -2,6 +2,18 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.4.0 (2026-11-10)
+
+**From Brandrup Rådgivning:**
+- New `/audit <url> --source <folder>` mode with `scripts/source-scan.mjs`, a read-only source scanner with no dependencies. It writes `source-data.json` (structure, duplication, CSS tokens, libraries and CDNs, form targets, masked possible secrets, placeholders, big and unused images, broken local links, hosting files) and `content-source/` with the exact page texts.
+- `audit.md` has a new Code section (9) after Tech and performance, ending in a Keep / Refactor / Rebuild verdict per file or area. Later sections renumbered (Issues is now 14). Possible secrets go in Issues as High, "Fixed by: code", never unmasked.
+- `/audit` self-check covers the Code section
+- `/kickoff` asks for the source code; if given, it goes in `original/`, committed untouched before any changes, and the next step is `/audit <url> --source original/`
+- README: source mode in the audit row
+- Fix (found while testing): placeholder `context` printed whole source lines, so a secret on the same line leaked unmasked. Lines with a possible secret are now hidden, and the `123456789` placeholder pattern needs word boundaries so it no longer matches inside keys.
+
+Tested on a local mock site (3 pages with shared header and footer, Formspree and JS-only forms, fake API key and passwords, placeholders, a 390 KB and an unused image, a broken link, `.htaccess` and robots.txt): all detected, source folder unchanged, no unmasked secret in the output. Mock deleted.
+
 ## 1.3.0 (2026-11-10)
 
 **From the Studio Sobra retro (audits of studio-sobra.vercel.app and studiosobra.com):**

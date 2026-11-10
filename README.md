@@ -47,7 +47,7 @@ On a new machine or fresh clone, reinstall the pack's skills with the `npx` comm
 | Step | What happens | Output |
 |---|---|---|
 | 0. Kickoff | `/kickoff`, pick pack and mode | CLAUDE.md, brief.md, first commit |
-| 0.5. Audit (redesigns only) | `/audit <url>`: crawl, screenshots, Lighthouse, findings | docs/audit/ |
+| 0.5. Audit (redesigns only) | `/audit <url>`: crawl, screenshots, Lighthouse, findings. Add `--source <folder>` to scan the source code too | docs/audit/ |
 | 1. Brief | Lock goal, audience, done criteria | docs/brief.md |
 | 2. Spec and plan | Superpowers brainstorm, spec, plan (Guided) or my own step list (Directed) | docs/superpowers/ |
 | 3. Build | Small steps, commit after each, test locally and on phone | commits |

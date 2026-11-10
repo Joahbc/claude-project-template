@@ -17,7 +17,7 @@ The audit files are **internal working notes**: direct and evidence-based. Anyth
 - Only audit a site the user is redesigning or has permission to analyse. If unsure, ask.
 - Keep the crawl polite: the script waits between pages and stops at `--max-pages`.
 - Separate **observations** (what the data or screenshots show) from **interpretations** (your judgement), and mark predictions as **Estimate:**. Every issue needs evidence: page, screenshot or data point.
-- The user's personal style rules (for example no em dashes) apply to **your own writing**. Never list them as findings about someone else's site. If they matter for a later build by the user, put them under "Notes for our build" in section 12.
+- The user's personal style rules (for example no em dashes) apply to **your own writing**. Never list them as findings about someone else's site. If they matter for a later build by the user, put them under "Notes for our build" in section 13.
 - English unless the user asks otherwise.
 
 ## 0. Ask first (one short message)
@@ -80,28 +80,30 @@ Use these sections, short and scannable, with screenshot links like `![](screens
 6. **Content**: tone of voice, languages, missing info (hours, address, prices, delivery, terms of trade, returns, company and CVR details), typos, outdated content
 7. **Visual style**: colors as hex with where they're used, typography (families, scale, weights), layout and spacing, imagery and photography, components (buttons, cards, forms), motion. Note what feels on brand and what feels generic or inconsistent.
 8. **Tech and performance**: stack, Lighthouse medians, page weight, oversized images, console errors, analytics
-9. **Accessibility**: contrast, alt text **including CSS background images**, heading order, form labels, `lang`, keyboard and focus, motion. Call out gaps Lighthouse doesn't catch.
-10. **SEO and findability**: titles, meta descriptions, Open Graph, structured data per page type, sitemap and robots, domain, Google Business profile (ask if unknown)
-11. **Mobile**: what works, what breaks, overflow
-12. **Keep / Change / Add**: the bridge to the redesign. What's good and must survive, what to fix, what's missing. End with **Notes for our build** if any.
-13. **Issues**: table with these columns:
+9. **Code** (source mode only, otherwise leave out): file structure, duplication across pages, CSS quality and tokens, dependencies and CDNs, where each form sends to, possible secrets, placeholders, big or unused images, broken local links, and hosting files (`.htaccess`, robots, sitemap, 404). Never print a secret's unmasked value; list each one as High with "Fixed by: code". End with a **Keep / Refactor / Rebuild** verdict per file or area, with one line of reasoning each.
+10. **Accessibility**: contrast, alt text **including CSS background images**, heading order, form labels, `lang`, keyboard and focus, motion. Call out gaps Lighthouse doesn't catch.
+11. **SEO and findability**: titles, meta descriptions, Open Graph, structured data per page type, sitemap and robots, domain, Google Business profile (ask if unknown)
+12. **Mobile**: what works, what breaks, overflow
+13. **Keep / Change / Add**: the bridge to the redesign. What's good and must survive, what to fix, what's missing. End with **Notes for our build** if any.
+14. **Issues**: table with these columns:
     | Severity | Issue | Evidence | Fixed by | Suggested fix |
     - Severity: High (loses customers, breaks a key flow, or a legal requirement), Medium, Low
     - Fixed by: **theme or code**, **admin settings**, **content** (the client supplies text, photos or info), or **platform** (can't be fixed from the site, such as a hosting or Shopify script)
-14. **Questions for the client**: things the audit can't answer
+15. **Questions for the client**: things the audit can't answer
 
 Also save `docs/audit/current-tokens.md`: the current palette, type and spacing as a reference, clearly labelled as the *old* system.
 
 ## 6. Self-check before reporting
 Go through this list and fix what fails:
-- Everything listed as missing in Content (6) appears in Issues (13) or under Add (12)
+- Everything listed as missing in Content (6) appears in Issues (14) or under Add (13)
 - Every High issue has evidence and a "Fixed by"
 - Numbers match across the summary, sections, scoreboard and chat report
 - Predictions are marked **Estimate:** and don't promise exact numbers that depend on things outside the site's control
 - No personal style rules are listed as findings
 - Structured data was checked on more than the homepage
-- Every entry in `placeholders`, `fonts.fallbackWarnings` and a failed `mobileMenu` check is either in Issues (13) or explained as harmless
+- Every entry in `placeholders`, `fonts.fallbackWarnings` and a failed `mobileMenu` check is either in Issues (14) or explained as harmless
 - Screenshot links point to files that exist
+- Source mode: the Code section (9) covers every area in its list, every possible secret is in Issues (14) as High with its value masked, and each file or area has a Keep / Refactor / Rebuild verdict
 
 ## 7. Connect it to the project
 If the folder has no `docs/brief.md` or `PROCESS.md` (no `/kickoff` yet), don't create them or run `git init`. Leave the audit in `docs/audit/`, say so in the report, and note that `/kickoff` will link it later. Otherwise:
@@ -129,6 +131,16 @@ Use when a site has changed (a new version launched, or your redesign went live)
 When comparing your own redesign after launch, this file is the before/after section of the case study.
 
 **`--compare` and `--learn` together:** everything goes in the new folder (`docs/audit-<short-name>/`), including `learnings.md`. Keep the full issues table, because the comparison needs it. Keep client questions to five or fewer.
+
+## Source mode: `/audit <url> --source <folder>`
+Use when you have the site's source code (for example `original/` from `/kickoff`). Run the scanner alongside the crawl in step 2:
+```bash
+node ~/.claude/skills/audit/scripts/source-scan.mjs <folder> docs/audit
+```
+It is read-only and needs no dependencies. It writes `docs/audit/source-data.json` (file inventory, duplication, CSS tokens, libraries and CDNs, forms and where they send, possible secrets with masked values, placeholders, big and unused images, broken local links, hosting files) and `docs/audit/content-source/`, the exact text of each page from the HTML.
+- Prefer `content-source/` over the crawler's `content/` for exact texts; use `content/` for what JavaScript renders
+- Write the Code section (9) of `audit.md` from `source-data.json`
+- Never copy a secret's value into any file or the chat, even partly beyond the scanner's mask
 
 ## Learn mode: `/audit <url> --learn`
 Use to study a well-made site for inspiration rather than to redesign it. Skip the issues table and client questions. Instead, write `learnings.md` in the audit folder:
