@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Crawls an existing website and saves what /audit needs to analyse it:
 // screenshots (desktop + mobile), page structure, content, styles and tech hints.
-// Read-only: it never submits forms, logs in or clicks buttons.
+// Read-only: it never submits forms, logs in or clicks buttons. The one exception
+// is a cookie banner's Decline/Reject button, so screenshots aren't covered by it
+// (pass --keep-cookie-banner to skip that).
 //
-// Usage: node crawl.mjs <url> [outDir] [--max-pages 20]
+// Usage: node crawl.mjs <url> [outDir] [--max-pages 20] [--keep-cookie-banner]
 
 import { chromium, devices } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -18,6 +20,7 @@ if (!startArg) {
 const outDir = args[1] && !args[1].startsWith("--") ? args[1] : "docs/audit";
 const maxIdx = args.indexOf("--max-pages");
 const maxPages = maxIdx >= 0 ? Number(args[maxIdx + 1]) || 20 : 20;
+const keepCookieBanner = args.includes("--keep-cookie-banner");
 
 const start = new URL(startArg);
 const origin = start.origin;
@@ -52,6 +55,7 @@ async function load(page, url) {
   } catch {
     response = await page.goto(url, { waitUntil: "load", timeout: 30000 }).catch(() => null);
   }
+  const cookieBanner = keepCookieBanner ? { found: false, dismissed: false, skipped: true } : await dismissCookieBanner(page);
   // Scroll through the page so lazy-loaded images and scroll animations trigger
   await page.evaluate(async () => {
     const el = window.__auditScroller();
@@ -63,7 +67,53 @@ async function load(page, url) {
     el.scrollTo(0, 0);
   }).catch(() => {});
   await sleep(800);
-  return response;
+  return { response, cookieBanner };
+}
+
+// Known consent tools first, then any visible button whose text means "decline".
+// Only ever clicks a decline/reject option, never accept or anything else.
+const BANNER_SELECTORS = [
+  "#shopify-pc__banner__btn-decline",          // Shopify Customer Privacy
+  "#CybotCookiebotDialogBodyButtonDecline",    // Cookiebot
+  "#onetrust-reject-all-handler",              // OneTrust
+  ".cky-btn-reject",                           // CookieYes
+  "#cookiescript_reject",                      // CookieScript
+  "[data-cookiefirst-action='reject']",        // CookieFirst
+  ".cmplz-deny",                               // Complianz (WordPress)
+];
+const DECLINE_TEXT = /^\s*(decline|decline all|reject|reject all|deny|refuse|only necessary|necessary only|use necessary cookies only|afvis|afvis alle|kun nødvendige|kun nødvendige cookies|rechazar|rechazar todo)\s*$/i;
+
+const bannerChecked = new WeakSet();
+
+async function dismissCookieBanner(page) {
+  // Banners often appear a moment after load, so wait up to 3 s on the first page
+  // of each browser context; after that one quick check is enough.
+  const ctx = page.context();
+  const deadline = Date.now() + (bannerChecked.has(ctx) ? 0 : 3000);
+  bannerChecked.add(ctx);
+  do {
+    for (const sel of BANNER_SELECTORS) {
+      const el = page.locator(sel).first();
+      if (await el.isVisible().catch(() => false)) {
+        await el.click({ timeout: 2000 }).catch(() => {});
+        await sleep(400);
+        return { found: true, dismissed: true, via: sel };
+      }
+    }
+    const buttons = page.locator("button, [role=button], a[role=button]");
+    const count = Math.min(await buttons.count().catch(() => 0), 60);
+    for (let i = 0; i < count; i++) {
+      const b = buttons.nth(i);
+      const label = (await b.innerText().catch(() => "")) || "";
+      if (DECLINE_TEXT.test(label) && (await b.isVisible().catch(() => false))) {
+        await b.click({ timeout: 2000 }).catch(() => {});
+        await sleep(400);
+        return { found: true, dismissed: true, via: `text: ${label.trim()}` };
+      }
+    }
+    if (Date.now() < deadline) await sleep(300);
+  } while (Date.now() < deadline);
+  return { found: false, dismissed: false };
 }
 
 // Finds what actually scrolls. Some sites scroll inside body, main or a wrapper
@@ -137,6 +187,27 @@ function extract() {
     height: img.naturalHeight,
     displayedWidth: img.clientWidth,
   }));
+
+  // Photos set as CSS backgrounds are invisible to screen readers unless labelled,
+  // and the browser can't pick a smaller size for them. Count the big ones.
+  const backgroundImages = [];
+  for (const el of document.querySelectorAll("body *")) {
+    if (backgroundImages.length >= 60) break;
+    const bg = getComputedStyle(el).backgroundImage;
+    if (!bg || bg === "none" || !bg.includes("url(")) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 120 || r.height < 120) continue; // skip icons and textures
+    const url = (bg.match(/url\(["']?([^"')]+)["']?\)/) || [])[1] || null;
+    const label = el.getAttribute("aria-label") || el.getAttribute("title") || null;
+    backgroundImages.push({
+      url,
+      width: Math.round(r.width),
+      height: Math.round(r.height),
+      roleImg: el.getAttribute("role") === "img",
+      label,
+      hidden: el.getAttribute("aria-hidden") === "true",
+    });
+  }
 
   const forms = [...document.querySelectorAll("form")].map((f) => ({
     action: f.getAttribute("action"),
@@ -236,6 +307,15 @@ function extract() {
     sections,
     images,
     imagesMissingAlt: images.filter((i) => i.alt === null || i.alt.trim() === "").length,
+    backgroundImages,
+    backgroundImagesUnlabelled: backgroundImages.filter((b) => !b.hidden && !(b.roleImg && b.label)).length,
+    jsonLdTypes: [...document.querySelectorAll("script[type='application/ld+json']")].flatMap((s) => {
+      try {
+        const j = JSON.parse(s.textContent);
+        const items = Array.isArray(j) ? j : j["@graph"] || [j];
+        return items.map((i) => i["@type"]).flat().filter(Boolean);
+      } catch { return ["(invalid JSON-LD)"]; }
+    }),
     forms,
     ctas,
     typography,
@@ -298,7 +378,7 @@ while (queue.length && pages.length < maxPages) {
   page.on("requestfailed", (r) => failedRequests.push(r.url()));
 
   const t0 = Date.now();
-  const response = await load(page, url);
+  const { response, cookieBanner } = await load(page, url);
   const loadMs = Date.now() - t0;
   const status = response?.status() ?? null;
   if (!status || status >= 400) {
@@ -334,6 +414,7 @@ while (queue.length && pages.length < maxPages) {
   pages.push({
     url, slug, status, loadMs, transferKb, mobileOverflow, consoleErrors, failedRequests,
     screenshots: { desktop: desktopShots, mobile: mobileShots },
+    cookieBanner,
     server: headers["server"] || null, poweredBy: headers["x-powered-by"] || null,
     vercel: !!headers["x-vercel-id"],
     ...rest,

@@ -2,6 +2,20 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.2.0 (2026-11-10)
+
+**From the Studio Sobra audit review:**
+- `/audit` crawler declines cookie banners (known consent tools, then decline-text buttons in English, Danish and Spanish), never accepts. `--keep-cookie-banner` keeps the banner.
+- `/audit` crawler records CSS background images and whether they're labelled, plus JSON-LD types per page
+- New `scripts/lighthouse.mjs`: three mobile Lighthouse runs per URL, with median and range in a summary file
+- `/audit` asks first: site status, who built it and key pages. Status sets severity for unfinished content.
+- Issues table has a "Fixed by" column: theme or code, admin settings, content, or platform
+- Self-check step before reporting, and a manual screenshots folder (`screenshots/manual/`)
+- Shops: adding a product to the cart to inspect its options is allowed, then the cart is emptied. Never checkout.
+- Audit files are internal notes; the client summary is separate and diplomatic. Personal style rules are never listed as findings.
+- `/retro` can improve skills and scripts, works in research or audit folders without a full project, and requires script changes to be tested on a local test page before committing
+- `package-lock.json` for the audit scripts is committed
+
 ## 1.1.1 (2026-11-10)
 
 **From the Studio Sobra audit:**
