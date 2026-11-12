@@ -12,6 +12,7 @@ claude-project-template/
 ├── base/                 # copied into every new project
 │   ├── CLAUDE.md         # project context, with {{placeholders}}
 │   ├── PROCESS.md        # decision log, AI disclosure, retro
+│   ├── DESIGN_CHECKLIST.md     # design, mobile, accessibility and voice checks
 │   ├── docs/brief.md     # goal, audience, constraints, done criteria
 │   ├── .claude/settings.json   # shared, generic permissions
 │   └── .gitignore
@@ -24,6 +25,7 @@ claude-project-template/
 ├── skills/
 │   ├── kickoff/          # /kickoff: scaffolds a new project from this template
 │   ├── audit/            # /audit: analyses an existing site before a redesign
+│   ├── handover/         # /handover: zips, client README, DEPLOY.md and AI prompt
 │   └── retro/            # /retro: closes a project and improves this template
 └── install.sh            # links the skills and user rules into ~/.claude
 ```
@@ -52,7 +54,7 @@ On a new machine or fresh clone, reinstall the pack's skills with the `npx` comm
 | 2. Spec and plan | Superpowers brainstorm, spec, plan (Guided) or my own step list (Directed) | docs/superpowers/ |
 | 3. Build | Small steps, commit after each, test locally and on phone | commits |
 | 4. Review | Design and accessibility review, audit first then apply | review notes in PROCESS.md |
-| 5. Ship | Deploy, verify live | live URL in CLAUDE.md |
+| 5. Ship | Deploy, verify live. Client uploads it: `/handover` (zips, README, DEPLOY.md, AI-PROMPT.md, live checks, compare audit) | live URL in CLAUDE.md, handover/ |
 | 6. Document | Case study notes for the portfolio | PROCESS.md |
 | 7. Retro | `/retro`, promote lessons to this template | new template version |
 

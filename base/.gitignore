@@ -20,3 +20,12 @@ build/
 
 # OS
 .DS_Store
+
+# Old site's source: reference only, may hold client files (never commit)
+original/
+
+# Raw client material before its metadata is stripped (never commit, never serve)
+_incoming/
+
+# Handover zips (built from a tag, not versioned)
+handover/

@@ -21,7 +21,8 @@ Ask these together, with sensible defaults shown:
 5. Deploy target, if known
 6. Anything fixed: deadline, people involved, constraints, school rules
 7. Is this a redesign of an existing site? If so, its URL.
-8. Do you have the source code? If so, copy it into `original/` and commit it untouched in its own commit before any other changes, then suggest `/audit <url> --source original/`.
+8. Do you have the source code? If so, it goes in `original/`, which is gitignored and never committed (it is the client's copy, often large, and may hold client files).
+9. Client projects and redesigns: which folders hold client files (uploads, shares, customer documents, case files)? Ask before copying anything. Never list or open their contents.
 
 For the coursework pack, also ask for course name, deadline, hand-in format and allowed exceptions.
 
@@ -34,6 +35,8 @@ Don't ask anything the user already answered in their message.
 4. Fill all `{{PLACEHOLDERS}}` in CLAUDE.md, PROCESS.md, docs/brief.md and package.json from the answers. Use today's date and the template version. Leave a clear `TODO:` for anything unknown instead of inventing it.
 5. In CLAUDE.md, delete the working-mode block that wasn't chosen
 6. Write a first draft of `docs/brief.md` from the answers. Mark guesses with `TODO:`.
+7. Source code given: copy it into `original/` (already in `.gitignore`; check with `git check-ignore original/` before the first commit). Under "Project rules" in CLAUDE.md, add: "`original/` is the old site, reference only, gitignored: don't edit or deploy it", plus one line naming each private folder from question 9 as never to be served, copied, uploaded or printed.
+8. Client material that arrives later (photos, PDFs, logos) goes in `_incoming/` (gitignored), never in the build output or the source, until its metadata is stripped (see the Client data rules).
 
 ## 3. Install
 1. For each skill in the pack, run one `npx -y skills add <source> --skill <skill> --agent claude-code` command as its own Bash call. Never wrap them in a shell loop: loops break under zsh. If one fails, list the repo's skills, pick the closest match, and tell the user so they can update `packs.json`.
@@ -49,6 +52,6 @@ Don't ask anything the user already answered in their message.
 One short summary: what was created, what's still `TODO:`, and the next step:
 - Guided: "Next: fill in the brief together, then start the Superpowers brainstorm"
 - Directed: "Next: give me step 1"
-- Redesign: the next step is `/audit <url>` before the brief, in either mode, with `--source original/` when the source code was given
+- Redesign: the next step is `/audit <url>` before the brief, in either mode, with `--source original/` when the source code was given, and one `--exclude <path>` per private folder (relative to `original/`)
 
 Don't start the brief or any build work until the user says so.

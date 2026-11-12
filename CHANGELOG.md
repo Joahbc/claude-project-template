@@ -2,6 +2,21 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.5.0 (2026-11-12)
+
+**From the Brandrup Rådgivning retro (redesign, static Node build, one.com, handed over to the client):**
+- `/kickoff`: `original/` is gitignored and never committed (was: commit it untouched, which would have put client case files in git). Asks which folders hold client files before copying anything; they go in the project's CLAUDE.md as never-serve and become `--exclude` paths for the audit. Later client material goes in `_incoming/`.
+- `base/.gitignore`: `original/`, `_incoming/`, `handover/`
+- User rules (Client data): raw client material goes in a gitignored `_incoming/`, never the build output or source; strip image metadata (EXIF, GPS, IPTC, XMP) and PDF metadata (Info, XMP, embedded file paths, orphaned objects), then verify. Kåre's photo had an IPTC block; his PDF had a file path from his computer and the logo's Inkscape info.
+- New `/handover` skill: upload zip with `.htaccess` verified and no junk, source zip from a tag without internal notes, tested in an empty folder; README for a non-developer; DEPLOY.md (delete old files by name, hidden files, host settings, checks with expected results); `AI-PROMPT.md` in English that tells the AI to answer in the client's language; after the client uploads: live checks, then `/audit <live url> --compare docs/audit` for the case study.
+- web-vanilla pack rules: libraries vendored, no CDN; real-phone checks via a temporary LAN copy without client data or a deployed preview (the old "same network" rule contradicted the 127.0.0.1 rule); no fixed panel inside `backdrop-filter` / `transform` / `filter`; blocking `boot.js` for the js class; opacity-only reveals; ScrollSmoother rules; contrast from tokens in a test; real touch swipe; CSP only on html/php; testing `.htaccess` against the macOS Apache (detached process group, `mod_autoindex`); old-URL 301s with a `THE_REQUEST` guard for `index.html`; deleting old files before the first upload.
+- New `base/DESIGN_CHECKLIST.md` for all packs (web-only and Danish-only items marked): background colors compared in the browser, hardcoded white in assets, logo changes as new files with approval, header height on phones, bottom contact strip, contact path, 320px words, Danish hyphenation, contrast, carousel controls, touch, brand-led motion, font trade-off, paper on paper, SVG cleanup, OG size, Danish phone format, voice.
+- Guided mode (`base/CLAUDE.md`): screenshot checkpoint after the first full page, before the rest is built
+- `references.md`: brandrupraadgivning.dk
+- The "check on a real phone" vs localhost conflict came up once 1.4.3 bound `npm run serve` to 127.0.0.1; now one rule
+
+Text-only changes, checked: skill frontmatter parses, `packs.json` parses, no em dashes, every referenced template file exists, `./install.sh` links `/handover`.
+
 ## 1.4.4 (2026-11-10)
 
 **From Brandrup Rådgivning:**

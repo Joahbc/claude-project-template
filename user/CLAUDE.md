@@ -19,6 +19,7 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 ## Client data
 - Never serve, upload, commit or print client data: documents, shared files, uploads, customer records, file names that identify a client or a case
 - Ask before starting any local server on a folder that may hold client data. Serve a copy without the private folders, bound to 127.0.0.1.
+- Material the client sends for the site (photos, PDFs, logos) is not client data, but it often hides some: raw files go in a gitignored `_incoming/` folder, never in the build output or the source. Strip metadata before use: EXIF, GPS, IPTC and XMP from images; for PDFs the Info dictionary, XMP, embedded file paths (such as `PTEX.FileName`) and orphaned objects. Then grep the result for what you removed, and check the text or image is unchanged.
 
 ## Design
 - Avoid generic, templated "AI" looks. Intentional typography, spacing and motion.
