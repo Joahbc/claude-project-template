@@ -8,6 +8,7 @@
 - Content photos are `<img>` with `srcset`, `sizes` and alt text, never CSS `background-image`. The first visible image gets `fetchpriority="high"` and no `loading="lazy"`.
 - Pre-launch sweep: no placeholder text, empty sections or placeholder tiles. Run `/audit` on the preview and clear `placeholders` first.
 - Design: work through `DESIGN_CHECKLIST.md` at the spec and before launch
+- Design skills: `design-taste-frontend` at the brainstorm (design direction in the spec) and at the screenshot checkpoint after the first full page; `web-design-guidelines` as a review step before launch, next to `DESIGN_CHECKLIST.md`: run it on the built site (or dev theme preview), show the findings by severity, fix after approval
 
 ### Layout, motion and accessibility
 - Never put a fixed panel (mobile menu, dialog) inside an element with `backdrop-filter`, `transform` or `filter`: that element becomes the panel's containing block and clips it. Put the blur on a `::before` instead

@@ -2,6 +2,17 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.5.1 (2026-11-12)
+
+**From the Brandrup Rådgivning retro, follow-up:** `design-taste-frontend` and `web-design-guidelines` were installed by the pack but never invoked, because no step named them; the retro then wrongly called them noise.
+- `packs.json`: every skill has a `when`
+- `base/CLAUDE.md`: new Skills section (`{{SKILLS_LIST}}`); `/kickoff` writes it from `packs.json`, plus the Superpowers skills in Guided mode
+- web-vanilla and shopify packs: `design-taste-frontend` at the brainstorm and the screenshot checkpoint; `web-design-guidelines` as a review step before launch, next to `DESIGN_CHECKLIST.md`
+- `/retro`: checks every installed skill (invoked? helped?) from the session transcripts; an uninvoked skill is "Unused: never invoked, so untested", never "noise", and the fix is a `when`, not pruning
+- `/handover`: no zips before the web-design-guidelines review has run and approved fixes are made
+
+Text-only changes, checked: `packs.json` parses with a `when` on every skill, skill frontmatter parses, no em dashes.
+
 ## 1.5.0 (2026-11-12)
 
 **From the Brandrup Rådgivning retro (redesign, static Node build, one.com, handed over to the client):**

@@ -17,7 +17,7 @@ Read, when present:
 - `CLAUDE.md` (note the template version it started from)
 - `PROCESS.md`, especially "Retro notes", "Decisions" and "Reviews"
 - `git log` since kickoff, looking for reverts, repeated fixes and long gaps
-- `skills-lock.json`, and which skills were actually used during the project if that can be seen
+- `skills-lock.json` and the Skills list in CLAUDE.md. For **every** installed skill, find out whether it was invoked (the session transcripts in `~/.claude/projects/<project>/*.jsonl` show each Skill call, e.g. `grep -o '"name":"Skill","input":{"skill":"[^"]*"'`) and, if it was, whether it helped
 - `docs/brief.md` done criteria: which were met?
 - `docs/audit*/`: method notes, workarounds Claude had to use, and "Suggestions for the template" and "Proposed for references.md" in `learnings.md`
 
@@ -34,7 +34,7 @@ Ask the user three quick questions, in one message:
 If the user already answered these in their message, don't ask again.
 
 ## 3. Write the retro
-In a full project, fill in the "Retro" section of PROCESS.md: what worked, what didn't, done criteria status, skills that helped, skills that were noise. Mark it `[draft]`. In a research folder, put the same in the chat.
+In a full project, fill in the "Retro" section of PROCESS.md: what worked, what didn't, done criteria status, skills that helped, skills that ran but didn't help (say why), and skills that were never invoked, listed as "Unused: never invoked, so untested". An uninvoked skill is untested, never "noise"; if no step named it, propose naming one (its `when` in `packs.json`) rather than pruning it. Mark it `[draft]`. In a research folder, put the same in the chat.
 
 ## 4. Propose changes
 Sort every lesson into one of these, and present them as a short list:

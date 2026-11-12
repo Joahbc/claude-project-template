@@ -35,6 +35,7 @@ Don't ask anything the user already answered in their message.
 4. Fill all `{{PLACEHOLDERS}}` in CLAUDE.md, PROCESS.md, docs/brief.md and package.json from the answers. Use today's date and the template version. Leave a clear `TODO:` for anything unknown instead of inventing it.
 5. In CLAUDE.md, delete the working-mode block that wasn't chosen
 6. Write a first draft of `docs/brief.md` from the answers. Mark guesses with `TODO:`.
+6a. Fill `{{SKILLS_LIST}}` in CLAUDE.md from `packs.json`: one line per pack skill, `` - `<skill>`: <when> ``. In Guided mode add `` - Superpowers: brainstorming, writing-plans, test-driven-development, executing-plans or subagent-driven-development, and a final review ``. A pack with no skills gets "- None"
 7. Source code given: copy it into `original/` (already in `.gitignore`; check with `git check-ignore original/` before the first commit). Under "Project rules" in CLAUDE.md, add: "`original/` is the old site, reference only, gitignored: don't edit or deploy it", plus one line naming each private folder from question 9 as never to be served, copied, uploaded or printed.
 8. Client material that arrives later (photos, PDFs, logos) goes in `_incoming/` (gitignored), never in the build output or the source, until its metadata is stripped (see the Client data rules).
 

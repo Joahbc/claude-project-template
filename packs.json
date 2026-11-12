@@ -1,5 +1,5 @@
 {
-  "_note": "Each pack lists skills to install per project, plugins it needs, and the default working mode. Skill names come from each repo; if an install fails, run `npx skills add <source> --list` to see current names and update this file.",
+  "_note": "Each pack lists skills to install per project, plugins it needs, and the default working mode. Skill names come from each repo; if an install fails, run `npx skills add <source> --list` to see current names and update this file. \"when\" says when Claude uses the skill; /kickoff copies it into the project's CLAUDE.md.",
   "globalPlugins": [
     "superpowers@claude-plugins-official"
   ],
@@ -8,12 +8,36 @@
       "description": "Vanilla HTML/CSS/JS sites, GSAP animation, scrollytelling, portfolios",
       "defaultMode": "Guided",
       "skills": [
-        { "source": "greensock/gsap-skills", "skill": "gsap-core" },
-        { "source": "greensock/gsap-skills", "skill": "gsap-timeline" },
-        { "source": "greensock/gsap-skills", "skill": "gsap-scrolltrigger" },
-        { "source": "greensock/gsap-skills", "skill": "gsap-performance" },
-        { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
-        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" }
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-core",
+          "when": "Writing or reviewing any GSAP tween, ease or stagger, and reduced-motion handling"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-timeline",
+          "when": "Sequencing several animation steps (intros, multi-step reveals)"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-scrolltrigger",
+          "when": "Scroll-driven animation: reveals, scrubbed or pinned sections"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-performance",
+          "when": "Before launch, and whenever motion janks: check transforms, layout thrash and mobile FPS"
+        },
+        {
+          "source": "vercel-labs/agent-skills",
+          "skill": "web-design-guidelines",
+          "when": "Review step before launch (next to DESIGN_CHECKLIST.md), and before /handover: run it on the built site and show findings by severity before fixing"
+        },
+        {
+          "source": "Leonxlnx/taste-skill",
+          "skill": "design-taste-frontend",
+          "when": "At the brainstorm (design direction in the spec) and at the screenshot checkpoint after the first full page"
+        }
       ],
       "plugins": []
     },
@@ -21,9 +45,21 @@
       "description": "Custom Shopify themes in Liquid, e-commerce sites and redesigns",
       "defaultMode": "Guided",
       "skills": [
-        { "source": "shopify/shopify-ai-toolkit", "skill": "shopify-liquid" },
-        { "source": "vercel-labs/agent-skills", "skill": "web-design-guidelines" },
-        { "source": "Leonxlnx/taste-skill", "skill": "design-taste-frontend" }
+        {
+          "source": "shopify/shopify-ai-toolkit",
+          "skill": "shopify-liquid",
+          "when": "Writing or reviewing any Liquid section, block, snippet or theme setting"
+        },
+        {
+          "source": "vercel-labs/agent-skills",
+          "skill": "web-design-guidelines",
+          "when": "Review step before launch (next to DESIGN_CHECKLIST.md), and before /handover: run it on the built site and show findings by severity before fixing"
+        },
+        {
+          "source": "Leonxlnx/taste-skill",
+          "skill": "design-taste-frontend",
+          "when": "At the brainstorm (design direction in the spec) and at the screenshot checkpoint after the first full page"
+        }
       ],
       "plugins": [
         "liquid-lsp@claude-plugins-official"

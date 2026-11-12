@@ -19,6 +19,10 @@ Template: v{{TEMPLATE_VERSION}} · Pack: {{PACK}} · Mode: {{MODE}} · Started: 
 - Target: {{DEPLOY_TARGET}}
 - Live URL: {{LIVE_URL}}
 
+## Skills
+<!-- Written by /kickoff from packs.json. Use each skill at the moment named; /retro checks whether it ran and helped. -->
+{{SKILLS_LIST}}
+
 ## Working mode: {{MODE}}
 <!-- Keep the block that matches the mode, delete the other. -->
 

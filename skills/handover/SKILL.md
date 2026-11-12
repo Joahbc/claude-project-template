@@ -18,6 +18,7 @@ Package a finished site so a client who isn't a developer can upload it, check i
 - `npm test`, the pre-launch check and the build pass; the working tree is clean
 - Ask, in one message, whatever isn't known: who receives it, their language, the host, whether they will edit texts, the live URL, and (redesigns) what happens to old folders on the server that aren't part of the new site
 - Redesign: list the old site's files to delete from `original/`, **top level only, never inside a private folder**
+- The pre-launch review has run: `web-design-guidelines` on the built site and `DESIGN_CHECKLIST.md`, findings shown by severity and the approved fixes made (PROCESS.md "Reviews"). If not, run it now and stop for approval: no zips before it
 
 ## 1. Make the source work on its own
 - `grep` the tools and tests for reads from files that won't be in the source zip (`docs/`, `PROCESS.md`, `CLAUDE.md`, `original/`). Move what they need into the source (e.g. an audit baseline as a constant in the script)
@@ -118,6 +119,7 @@ unzip -l handover/<site>-upload.zip
 3. For the case study, run `/audit <live url> --compare docs/audit` and add the before and after numbers to "Case study notes" in PROCESS.md
 
 ## Self-check
+- [ ] web-design-guidelines review ran on the built site before the zips, approved fixes made
 - [ ] Source zip passed build, check and tests in an empty folder
 - [ ] `.htaccess` listed in the upload zip; no junk files
 - [ ] No internal notes or private files in either zip

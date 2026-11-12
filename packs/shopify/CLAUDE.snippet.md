@@ -9,3 +9,4 @@
 - Keep a "Client handover" section in PROCESS.md: how they edit content, add products and get help
 - Content photos (products, heroes, projects) are `<img>` via `image_url` and `image_tag` with `widths`, `sizes` and alt text, never CSS `background-image`. The first visible image gets `fetchpriority="high"` and no lazy loading. Decorative backgrounds only get `aria-hidden`.
 - Pre-launch sweep before the theme goes live: no "[to be added]", "coming soon" or lorem text, no empty collections in the nav, no placeholder tiles, no events without a date or sign-up. Run `/audit` on the dev theme preview and clear `placeholders` first.
+- Design skills: `design-taste-frontend` at the brainstorm (design direction in the spec) and at the screenshot checkpoint after the first full page; `web-design-guidelines` as a review step before launch, next to `DESIGN_CHECKLIST.md`: run it on the built site (or dev theme preview), show the findings by severity, fix after approval
