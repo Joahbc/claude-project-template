@@ -25,8 +25,9 @@ for skill in "$TEMPLATE_DIR"/skills/*/; do
   link "${skill%/}" "$CLAUDE_DIR/skills/$name"
 done
 
-# Personal rules for all projects
+# Personal rules and craft principles for all projects
 link "$TEMPLATE_DIR/user/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+link "$TEMPLATE_DIR/user/STYLE.md" "$CLAUDE_DIR/STYLE.md"
 
 # Tell the skills where the template lives
 echo "$TEMPLATE_DIR" > "$CLAUDE_DIR/project-template-path"

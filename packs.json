@@ -1,5 +1,5 @@
 {
-  "_note": "Each pack lists skills to install per project, plugins it needs, and the default working mode. Skill names come from each repo; if an install fails, run `npx skills add <source> --list` to see current names and update this file. \"when\" says when Claude uses the skill; /kickoff copies it into the project's CLAUDE.md.",
+  "_note": "Each pack lists skills to install per project, plugins it needs, and the default working mode. Skill names come from each repo; if an install fails, run `npx skills add <source> --list` to see current names and update this file. \"when\" says when Claude uses the skill; /kickoff copies it into the project's CLAUDE.md. \"optionalSkills\" are installed only when the spec picks the option named in their \"when\". \"mcpServers\" go in the project's .mcp.json (project scope, never global); \"config\" is copied as is.",
   "globalPlugins": [
     "superpowers@claude-plugins-official"
   ],
@@ -40,6 +40,122 @@
         }
       ],
       "plugins": []
+    },
+    "creative": {
+      "description": "Experimental, interactive sites (Astro, GSAP, Lenis, three.js, React islands only where state needs it): portfolios, art and editorial sites",
+      "defaultMode": "Guided",
+      "skills": [
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-core",
+          "when": "Writing or reviewing any GSAP tween, ease or stagger, and gsap.matchMedia() for reduced motion"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-timeline",
+          "when": "Sequencing several animation steps (intros, multi-step reveals, page transitions)"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-scrolltrigger",
+          "when": "Pinned, scrubbed or scroll-linked sections, and syncing ScrollTrigger with Lenis"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-plugins",
+          "when": "SplitText, Flip, Draggable, Inertia or Observer: text effects, layout transitions, drag and pointer interactions"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-react",
+          "when": "GSAP inside a React island or the Vite + React option (useGSAP, cleanup on unmount)"
+        },
+        {
+          "source": "greensock/gsap-skills",
+          "skill": "gsap-performance",
+          "when": "At the screenshot checkpoint, before launch, and whenever motion janks on the throttled phone profile"
+        },
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-fundamentals",
+          "when": "Setting up any three.js scene: renderer, camera, resize, render loop, disposal"
+        },
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-shaders",
+          "when": "Custom shader effects (image distortion, grain, transitions) and shader debugging"
+        },
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-textures",
+          "when": "Images or video as textures: colour space, sizing, memory"
+        },
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-interaction",
+          "when": "Pointer, drag or hover in a three.js scene"
+        },
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-performance",
+          "when": "A scene misses the performance budget, janks, or before launch on any page with WebGL"
+        },
+        {
+          "source": "anthropics/skills",
+          "skill": "frontend-design",
+          "when": "At the brainstorm, for each Explore prototype, and at the screenshot checkpoint. STYLE.md (or the client's brief) pins the direction, which the skill says always wins"
+        },
+        {
+          "source": "vercel-labs/agent-skills",
+          "skill": "web-design-guidelines",
+          "when": "Review step before launch (next to DESIGN_CHECKLIST.md), and before /handover: run it on the built site and show findings by severity before fixing"
+        }
+      ],
+      "optionalSkills": [
+        {
+          "source": "CloudAI-X/threejs-skills",
+          "skill": "threejs-react-three-fiber",
+          "when": "Only if the spec picks Vite + React with React Three Fiber and drei"
+        },
+        {
+          "source": "vercel-labs/agent-skills",
+          "skill": "vercel-react-best-practices",
+          "when": "Only if the spec picks Vite + React: React performance and bundle review"
+        }
+      ],
+      "mcpServers": {
+        "astro-docs": {
+          "config": {
+            "type": "http",
+            "url": "https://mcp.docs.astro.build/mcp"
+          },
+          "when": "Before writing Astro config, integrations, islands, image or routing code: current Astro docs (official, by the Astro team)"
+        },
+        "context7": {
+          "config": {
+            "type": "http",
+            "url": "https://mcp.context7.com/mcp"
+          },
+          "when": "Current docs for libraries without an installed skill (Lenis, drei, Astro integrations), or to check a version-specific API"
+        },
+        "chrome-devtools": {
+          "config": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+              "-y",
+              "chrome-devtools-mcp@latest",
+              "--isolated",
+              "--no-usage-statistics"
+            ]
+          },
+          "when": "Performance budget checks (trace with 4x CPU throttling and Fast 4G), console errors and layout debugging, at the screenshot checkpoint and before launch. --isolated uses a temporary Chrome profile, never the personal one"
+        }
+      },
+      "plugins": [],
+      "requires": [
+        "Node.js 22.23 or newer (Astro 7)"
+      ]
     },
     "shopify": {
       "description": "Custom Shopify themes in Liquid, e-commerce sites and redesigns",

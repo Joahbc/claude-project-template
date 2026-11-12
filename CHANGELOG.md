@@ -2,6 +2,21 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.6.0 (2026-11-12)
+
+**From the creative pack brainstorm (portfolio redesign next, then Dariia Taradai's site):**
+- New **creative** pack for experimental, interactive sites. Default stack: Astro with static output, GSAP, Lenis, plain three.js loaded only near its canvas, and React islands only where state needs it. Vite + React (with R3F and drei) is the option for app-like projects, with `optionalSkills` installed only if the spec picks it. Static `dist/` works on Apache (one.com, with the web-vanilla hosting rules) and on Cloudflare (Workers static assets or Pages).
+- **Explore** step in Guided mode (creative pack), before the spec: 2 or 3 throwaway prototypes in `explore/`, desktop and phone screenshots plus a Playwright recording each, cost and risk notes, then Joah chooses. Prototype code is rebuilt to the spec, never moved into `src/`.
+- Core creative rules: a performance budget on a mid-range phone (LCP 2.5 s, INP 200 ms, CLS 0.1, 60 fps and never under 30, measured with the Chrome DevTools MCP at 4x CPU throttling and Fast 4G); reduced motion for every effect; WebGL fallback, pausing off-screen and disposal; canvas content with a DOM equivalent; readable without JavaScript; fonts self-hosted, subset and listed with their licence in `FONTS.md`
+- `packs.json`: creative skills with a `when` each (6 GSAP, 5 three.js from `CloudAI-X/threejs-skills`, `frontend-design` from Anthropic, `web-design-guidelines`), and a new `mcpServers` field (Astro Docs, Context7, Chrome DevTools). `/kickoff` writes them to the project's `.mcp.json` (project scope, never global) and lists them in CLAUDE.md.
+- New `user/STYLE.md`, Joah's craft principles, imported into the global rules and linked by `install.sh`: scale contrast, warm grounds and never pure white for his own work, motion that answers scroll, drag and pointer, confident grotesques with an expanded display face, polish in the small interactions, and a "To define in the portfolio redesign" list. Client work gets the craft with the client's palette and type. `/retro` proposes updates to it through the promotion ladder.
+- Font licences: a global rule (check before use; demo fonts never in anything published; client sites never demo or unlicensed) and a `DESIGN_CHECKLIST.md` check. The old portfolio used a demo Akira Expanded.
+- `references.md`: nine sites, marked "Joah's style" or "Liked"
+- New `docs/research/` for comparisons a project hasn't tested yet: CMS for client editing (Sanity first, with an email or Google login as a hard requirement), Sanity requirements (ownership, backups, privacy), page-turn interactions, and the skills and MCP servers left out and why. `/retro` reads them and promotes a note only after a project has tested it.
+- `base/.gitignore`: `.astro/` and Explore recordings
+
+Checked: `packs.json` parses with a `when` on every skill, optional skill and MCP server; every skill name exists in its source repo (`npx skills add <repo> --list`); the Astro Docs and Context7 MCP servers answer an MCP initialize call and `chrome-devtools-mcp` resolves on npm; skill frontmatter parses; a dry-run kickoff of the creative pack in a scratch folder; `./install.sh` links `~/.claude/STYLE.md`; no em dashes.
+
 ## 1.5.1 (2026-11-12)
 
 **From the Brandrup Rådgivning retro, follow-up:** `design-taste-frontend` and `web-design-guidelines` were installed by the pack but never invoked, because no step named them; the retro then wrongly called them noise.

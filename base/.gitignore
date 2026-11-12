@@ -13,6 +13,12 @@
 node_modules/
 dist/
 build/
+.astro/
+
+# Explore prototype recordings (screenshots are committed)
+explore/**/*.webm
+explore/**/*.mp4
+explore/**/*.mov
 
 # Installed skills (restore from skills-lock.json)
 .claude/skills/

@@ -35,14 +35,15 @@ Don't ask anything the user already answered in their message.
 4. Fill all `{{PLACEHOLDERS}}` in CLAUDE.md, PROCESS.md, docs/brief.md and package.json from the answers. Use today's date and the template version. Leave a clear `TODO:` for anything unknown instead of inventing it.
 5. In CLAUDE.md, delete the working-mode block that wasn't chosen
 6. Write a first draft of `docs/brief.md` from the answers. Mark guesses with `TODO:`.
-6a. Fill `{{SKILLS_LIST}}` in CLAUDE.md from `packs.json`: one line per pack skill, `` - `<skill>`: <when> ``. In Guided mode add `` - Superpowers: brainstorming, writing-plans, test-driven-development, executing-plans or subagent-driven-development, and a final review ``. A pack with no skills gets "- None"
+6a. Fill `{{SKILLS_LIST}}` in CLAUDE.md from `packs.json`: one line per pack skill, `` - `<skill>`: <when> ``. In Guided mode add `` - Superpowers: brainstorming, writing-plans, test-driven-development, executing-plans or subagent-driven-development, and a final review ``. A pack with no skills gets "- None". If the pack has `optionalSkills`, add them under "Optional (not installed)" with their `when`. If it has `mcpServers`, add "MCP servers (project, `.mcp.json`)" with one line per server, `` - `<name>`: <when> ``
 7. Source code given: copy it into `original/` (already in `.gitignore`; check with `git check-ignore original/` before the first commit). Under "Project rules" in CLAUDE.md, add: "`original/` is the old site, reference only, gitignored: don't edit or deploy it", plus one line naming each private folder from question 9 as never to be served, copied, uploaded or printed.
 8. Client material that arrives later (photos, PDFs, logos) goes in `_incoming/` (gitignored), never in the build output or the source, until its metadata is stripped (see the Client data rules).
 
 ## 3. Install
 1. For each skill in the pack, run one `npx -y skills add <source> --skill <skill> --agent claude-code` command as its own Bash call. Never wrap them in a shell loop: loops break under zsh. If one fails, list the repo's skills, pick the closest match, and tell the user so they can update `packs.json`.
-2. For each plugin in the pack and in `globalPlugins`: check whether it's installed. If not, tell the user the exact `/plugin install ...` command to run (Claude can't run slash commands).
-3. Mention anything under `requires` that the user needs to set up.
+2. If the pack has `mcpServers`: write `.mcp.json` in the project root as `{"mcpServers": {"<name>": <config>}}`, copying each `config` as is. Project scope only, never `claude mcp add --scope user`. Tell the user Claude Code asks to approve them on first use. Don't install `optionalSkills`; they're installed later if the spec picks their option.
+3. For each plugin in the pack and in `globalPlugins`: check whether it's installed. If not, tell the user the exact `/plugin install ...` command to run (Claude can't run slash commands).
+4. Mention anything under `requires` that the user needs to set up, and check it where you can (e.g. `node --version`).
 
 ## 4. Commit
 - `git init` if needed, then commit everything: `chore: kickoff from template v<version> (<pack>, <mode>)` with a Co-Authored-By line
@@ -52,6 +53,7 @@ Don't ask anything the user already answered in their message.
 ## 5. Report
 One short summary: what was created, what's still `TODO:`, and the next step:
 - Guided: "Next: fill in the brief together, then start the Superpowers brainstorm"
+- Guided, creative pack: "Next: fill in the brief together, then the brainstorm, then Explore (2 or 3 throwaway prototypes) before the spec"
 - Directed: "Next: give me step 1"
 - Redesign: the next step is `/audit <url>` before the brief, in either mode, with `--source original/` when the source code was given, and one `--exclude <path>` per private folder (relative to `original/`)
 

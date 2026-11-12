@@ -9,6 +9,7 @@ Current version: see `VERSION`. History: see `CHANGELOG.md`.
 ```
 claude-project-template/
 ├── user/CLAUDE.md        # personal rules for ALL projects (goes to ~/.claude/CLAUDE.md)
+├── user/STYLE.md         # my craft principles, a living file (goes to ~/.claude/STYLE.md)
 ├── base/                 # copied into every new project
 │   ├── CLAUDE.md         # project context, with {{placeholders}}
 │   ├── PROCESS.md        # decision log, AI disclosure, retro
@@ -18,10 +19,12 @@ claude-project-template/
 │   └── .gitignore
 ├── packs/                # one folder per project type
 │   ├── web-vanilla/      # HTML/CSS/JS, GSAP, scrollytelling
+│   ├── creative/         # Astro, GSAP, Lenis, three.js: experimental, interactive sites
 │   ├── shopify/          # Shopify themes and e-commerce
 │   └── coursework/       # school projects with strict rules
 ├── packs.json            # which skills, plugins and mode each pack uses
 ├── references.md         # reference sites and the patterns each is good for
+├── docs/research/        # comparisons not yet tested in a project (promoted at /retro)
 ├── skills/
 │   ├── kickoff/          # /kickoff: scaffolds a new project from this template
 │   ├── audit/            # /audit: analyses an existing site before a redesign
@@ -51,6 +54,7 @@ On a new machine or fresh clone, reinstall the pack's skills with the `npx` comm
 | 0. Kickoff | `/kickoff`, pick pack and mode | CLAUDE.md, brief.md, first commit |
 | 0.5. Audit (redesigns only) | `/audit <url>`: crawl, screenshots, Lighthouse, findings. Add `--source <folder>` to scan the source code too | docs/audit/ |
 | 1. Brief | Lock goal, audience, done criteria | docs/brief.md |
+| 1.5. Explore (creative pack, Guided) | 2 or 3 throwaway prototypes of interaction ideas, screenshots and recordings; I choose before the spec | explore/, PROCESS.md |
 | 2. Spec and plan | Superpowers brainstorm, spec, plan (Guided) or my own step list (Directed) | docs/superpowers/ |
 | 3. Build | Small steps, commit after each, test locally and on phone | commits |
 | 4. Review | Design and accessibility review, audit first then apply | review notes in PROCESS.md |
@@ -72,6 +76,8 @@ Every lesson climbs a ladder:
 1. **Project:** a rule that helped once stays in that project's CLAUDE.md
 2. **Template:** helped in two or more projects, so it moves into `base/` or a pack
 3. **Global:** applies to everything I do, so it moves into `user/CLAUDE.md`
+
+`user/STYLE.md` climbs the same ladder: a craft choice moves from "Direction" to "Proven" once it has held up across projects. Research in `docs/research/` becomes a pack rule only after a project has tested it.
 
 Things that didn't help get pruned the same way. `/retro` proposes the moves, I approve them, and it bumps `VERSION` and writes the `CHANGELOG.md` entry.
 

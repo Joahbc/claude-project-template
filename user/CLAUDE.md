@@ -22,11 +22,16 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 - Material the client sends for the site (photos, PDFs, logos) is not client data, but it often hides some: raw files go in a gitignored `_incoming/` folder, never in the build output or the source. Strip metadata before use: EXIF, GPS, IPTC and XMP from images; for PDFs the Info dictionary, XMP, embedded file paths (such as `PTEX.FileName`) and orphaned objects. Then grep the result for what you removed, and check the text or image is unchanged.
 
 ## Design
+- My craft principles are in `~/.claude/STYLE.md` (template: `user/STYLE.md`), imported below. My own work follows all of it; client work gets the craft with the client's own palette and type.
 - Avoid generic, templated "AI" looks. Intentional typography, spacing and motion.
 - Mobile matters as much as desktop. Check both.
 - Accessibility is part of done, not an extra
+- Fonts: check the licence before using one. Demo fonts are usually personal-use only. My own published site needs a proper licence; client sites never use demo or unlicensed fonts.
 
 ## Logging
 - Log meaningful decisions in PROCESS.md as they happen (what, why, alternatives)
 - Draft entries are marked `[draft]` so I can rewrite them in my own words
 - When something goes wrong or a rule you were given causes friction, add a line under "Retro notes" in PROCESS.md
+
+## Style
+@~/.claude/STYLE.md

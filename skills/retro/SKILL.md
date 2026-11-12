@@ -21,7 +21,7 @@ Read, when present:
 - `docs/brief.md` done criteria: which were met?
 - `docs/audit*/`: method notes, workarounds Claude had to use, and "Suggestions for the template" and "Proposed for references.md" in `learnings.md`
 
-Then read the template (path in `~/.claude/project-template-path`): `VERSION`, `CHANGELOG.md`, `user/CLAUDE.md`, `references.md`, `base/`, the project's pack, `packs.json`, and the `SKILL.md` of every skill in `skills/` that was used.
+Then read the template (path in `~/.claude/project-template-path`): `VERSION`, `CHANGELOG.md`, `user/CLAUDE.md`, `user/STYLE.md`, `references.md`, `docs/research/`, `base/`, the project's pack, `packs.json`, and the `SKILL.md` of every skill in `skills/` that was used.
 
 If the project started from an older template version, note what changed since then.
 
@@ -44,6 +44,8 @@ Sort every lesson into one of these, and present them as a short list:
 | Keep in project | this project's CLAUDE.md | helped once, too specific |
 | Promote to template | `base/` or `packs/<pack>/` or `packs.json` | helped in 2+ projects, or clearly reusable for this type |
 | Promote to global | `user/CLAUDE.md` | applies to everything Joah does |
+| Update the style | `user/STYLE.md` | a craft choice proved itself, a "To define" item got defined, or a principle didn't hold up. Same ladder: tried once stays a note in the project, kept across projects moves up from "Direction" to "Proven" |
+| Promote research | `docs/research/` to `packs/<pack>/` or `packs.json` | a research note was tested in a real project; mark the note as promoted, or as rejected with why |
 | Add a reference | `references.md` | a studied site has patterns worth reusing |
 | Improve a skill | `skills/<name>/SKILL.md` or its `scripts/` | a skill's instructions were unclear, missed something, or Claude needed a workaround |
 | Prune | remove from template | a rule or skill that didn't help, or caused friction |
@@ -58,7 +60,7 @@ Keep it small. Three to six good changes beat fifteen.
 2. **Script changes must be tested before committing.** Run the script against a small local test page that reproduces the case (serve it with `python3 -m http.server --bind 127.0.0.1`), check the output, then delete the test files. Text-only changes need `node --check` or a JSON parse at most.
 3. Bump `VERSION`: patch for wording, minor for new rules, skills, script features or packs, major for workflow changes
 4. Add a `CHANGELOG.md` entry: version, date, each change, and the project it came from
-5. If `user/CLAUDE.md` or a skill changed, remind the user they're symlinked, so they're live immediately. A **new** skill needs `./install.sh` again.
+5. If `user/CLAUDE.md`, `user/STYLE.md` or a skill changed, remind the user they're symlinked, so they're live immediately. A **new** skill needs `./install.sh` again.
 6. Commit in the template repo: `retro: <project name> -> v<new version>` with a Co-Authored-By line, and suggest pushing it
 
 ## 6. Close

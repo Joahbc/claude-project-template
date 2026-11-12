@@ -28,6 +28,7 @@ Work through this at the spec and again before launch. Items marked **[web]** ar
 
 ## Typography and assets
 - [ ] Font choice and its trade-off written in the spec (e.g. a system font: zero external requests and full privacy, less character)
+- [ ] Every font's licence checked and recorded (family, foundry, licence, web use allowed): no demo or personal-use fonts in anything published; client sites never use demo or unlicensed fonts
 - [ ] Form fields and cards stay visible on an off-white background: white "paper on paper", with a border
 - [ ] Logo SVGs optimized (unused clip paths, editor metadata): one logo shrank 62%
 - [ ] Open Graph image 1200×630
