@@ -1,6 +1,6 @@
 # Process: {{PROJECT_NAME}}
 
-Running log of decisions, AI use and lessons. Entries marked `[draft]` are written by Claude and should be rewritten in my own words before sharing.
+Running log of decisions, AI use and lessons. An internal log: Claude writes entries as final.
 
 ## Decisions
 <!-- Newest first. Format: date, decision, why, alternatives considered. -->

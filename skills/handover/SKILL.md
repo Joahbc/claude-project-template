@@ -1,6 +1,6 @@
 ---
 name: handover
-description: Hand a finished client website over to a client who uploads it and edits texts themselves. Use when the user runs /handover, says the site is done and the client takes over, or asks for upload and source zips, a client README, DEPLOY.md, an AI prompt for the client, or the checks after the client has uploaded.
+description: Hand a finished client website over to a client who uploads it and edits texts themselves. Not for a session handoff (a long session ending mid-plan): that's a Handoff section at the top of the current plan. Use when the user runs /handover, says the site is done and the client takes over, or asks for upload and source zips, a client README, DEPLOY.md, an AI prompt for the client, or the checks after the client has uploaded.
 ---
 
 # Handover

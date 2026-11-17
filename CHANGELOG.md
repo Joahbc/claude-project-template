@@ -2,6 +2,21 @@
 
 Each entry says what changed and which project taught it.
 
+## 1.7.0 (2026-11-17)
+
+**From the portfolio redesign retro (joahbrandrup-portfolio: creative pack, Guided, Astro on one.com with a Sanity gallery):**
+- `user/CLAUDE.md`, How we work: check type checks and tests by exit code, never by reading output; chain test, commit and push with `&&`; a skipped test is untested (run it where it can run); run CI-bound tests once from a fresh clone, with temp files in the OS temp folder; an independent review before anything touching secrets or the live server goes live. Three pushes with failing checks, and three failed CI runs, in this project
+- `user/CLAUDE.md`, new "Reporting to me": one recommendation first, short reports; explain each technical term in one line; say where a fact came from (a bug from Claude's own session became a launch blocker nobody could reproduce); log bugs with device, browser, input and steps; dashboard steps written from docs say so and ask for a screenshot when the screen differs (Cloudflare's docs didn't match its UI)
+- Logging: PROCESS.md is an internal log, written as final, no `[draft]` markers (`user/CLAUDE.md`, `base/PROCESS.md`, `/retro`). Text is flagged for Joah to rewrite only when it goes on the site, to a client, or is graded (the coursework pack keeps its rule)
+- `base/CLAUDE.md`, Guided: each plan task names the skills whose `when` fits it, and whoever runs the task loads them first. Second time skills went unused (1.5.1 added the `when` lines): here all six GSAP skills never ran although GSAP does most of the motion, because the spec and plans never named them and tasks run from the plan, often in a fresh subagent. `/retro` now checks whether the specs and plans named each skill
+- `base/CLAUDE.md`: a session handoff is a "Handoff" section at the top of the current plan; `/handover`'s description says it isn't one (they were mixed up twice)
+- New `hosting/one-com.md`, host facts any pack can reference (the web-vanilla and creative packs point to it): HTTPS and `www` in `.htaccess`, preflight folders for new `.htaccess` lines, what one.com allows, its own 403 on `.DS_Store`, the Varnish cache, 429s, upload order and backup, SFTP (host name, password only without SSH, ED25519 pin, web root path). Second one.com project
+- `hosting/one-com.md` also points to the tested Sanity-to-one.com publish (GitHub Action, SFTP with rclone) in the portfolio repo, with its three pitfalls; a recipe once a second project needs SFTP deploys
+- `docs/research/2026-11-12-cms-client-editing.md`: Sanity tested in the portfolio
+- Creative pack, default stack: the portfolio's setup, each choice with one line on why: Astro (static), TypeScript, GSAP and Lenis, three.js, Sanity when the client edits content, Vitest and Playwright, and the publish workflow on an SFTP host. For an existing site, `/audit` decides keep, refactor or rebuild first
+- `user/STYLE.md`: "Craft defaults (from the portfolio redesign)": motion, type, grid and what satisfying means, as general principles; the portfolio's numbers, palette and names stay in its docs. Two lines from 1.6.0 that named a font and a palette are general now
+- `packs.json`, creative pack: `playwright-cli` added to the skills (it was used about 190 times in the portfolio, through `npx`)
+
 ## 1.6.0 (2026-11-12)
 
 **From the creative pack brainstorm (portfolio redesign next, then Dariia Taradai's site):**

@@ -27,6 +27,8 @@ Template: v{{TEMPLATE_VERSION}} · Pack: {{PACK}} · Mode: {{MODE}} · Started: 
 <!-- Keep the block that matches the mode, delete the other. -->
 
 **Guided:** use the Superpowers flow. Brainstorm, then spec, then plan, then build, with reviews in between. Specs and plans go in `docs/superpowers/`. Stop for my approval after the spec and after the plan. Sites: after the first full page (usually home) is built, stop with desktop and phone screenshots for approval before building the rest.
+- Each plan task names the skills from the Skills list whose `when` fits it ("Skills: gsap-scrolltrigger, gsap-core"). Whoever carries out the task, a subagent too, loads them before writing code: tasks are run from the plan, and the Skills list above isn't in front of a fresh subagent
+- Session handoff (a long session ends mid-plan): a "Handoff" section at the top of the current plan: where it stands, next steps in order, what waits on me, session setup. Not `/handover`, which hands a finished site to a client
 
 **Directed:** I give you the steps. Do exactly one step at a time, then stop and report. Don't plan ahead or start the next step until I ask. Don't use Superpowers process skills unless I ask.
 

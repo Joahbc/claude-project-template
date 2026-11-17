@@ -19,6 +19,7 @@
 - Contrast is computed from the color tokens in a test (Lighthouse passed a 3.4:1 grey). Swipe is tested with real touch events (`hasTouch`), not only pointer events
 
 ### Hosting (Apache, e.g. one.com)
+- On one.com: read the template's `hosting/one-com.md` (template path in `~/.claude/project-template-path`): HTTPS in `.htaccess`, preflight folders, the Varnish cache, 429s, uploads, SFTP
 - CSP header only on `.html` and `.php` (`<FilesMatch>`): on every response it blocks `<style>` inside SVG images
 - Test `.htaccess` against the real Apache in macOS (`/usr/sbin/httpd`): spawn it with `detached: true` and kill the process group (`process.kill(-pid)`), or its shutdown signal kills node and the shell; load `mod_autoindex` too, or `Options -Indexes` answers 404 instead of the host's 403. Skip the test where httpd is missing
 - Redesigns: 301 redirects from every old page URL to its new page, before the HTTPS rule and straight to `https://`, so old links take one hop. A root `index.html` redirect must match `%{THE_REQUEST}`, or Apache's internal `/` to `index.html` lookup loops

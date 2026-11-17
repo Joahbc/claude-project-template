@@ -2,10 +2,15 @@
 Experimental, interactive sites where type, colour and motion carry the experience. The feel comes from craft, not the framework: Joah's craft principles are in `~/.claude/STYLE.md` (loaded globally). Clients get the craft with their own palette and type.
 
 ### Stack (default unless the spec says otherwise)
-- **Astro, static output** (`output: 'static'`), so `dist/` runs on any host. Pages are real HTML; JavaScript only enhances them.
-- **GSAP** for motion (ScrollTrigger for pinned and scrubbed sections, plugins such as SplitText, Flip, Draggable and Observer for pointer and drag), in plain `<script>` tags in `.astro` components
-- **Lenis** for smooth scroll, driven by GSAP's ticker (`gsap.ticker.add`, `lenis.on('scroll', ScrollTrigger.update)`). ScrollSmoother only if the spec needs its effects; then follow the ScrollSmoother rules below.
-- **three.js** for WebGL, plain (no React), loaded as a separate chunk only when its canvas comes near the viewport
+Proven in the portfolio redesign (2026-11). For an existing site, `/audit` decides first: its Code section says keep, refactor or rebuild per area, and this stack applies to what gets rebuilt.
+- **Astro, static output** (`output: 'static'`). Why: `dist/` runs on any host (Apache or Cloudflare), and pages are real HTML, so no-JS, search and speed hold; JavaScript only enhances them.
+- **TypeScript** (`astro check` in the test chain). Why: it catches wrong props and content shapes (CMS documents) before the browser does.
+- **GSAP** for motion (ScrollTrigger for pinned and scrubbed sections, plugins such as SplitText, Flip, Draggable and Observer for pointer and drag), in plain `<script>` tags in `.astro` components. Why: precise timing and the plugins pointer-driven motion needs, and `gsap.matchMedia()` keeps every reduced-motion version in one place.
+- **Lenis** for smooth scroll, driven by GSAP's ticker (`gsap.ticker.add`, `lenis.on('scroll', ScrollTrigger.update)`). Why: physical scroll that stays native underneath (keyboard, anchors, find in page), off on touch and with reduced motion. ScrollSmoother only if the spec needs its effects; then follow the ScrollSmoother rules below.
+- **three.js** for WebGL, plain (no React), loaded as a separate chunk only when its canvas comes near the viewport. Why: image effects (grain, CRT, distortion) without a framework, and no cost before its canvas.
+- **Sanity, when the client edits content** (read at build time, so the output stays static). Why: a Google or email login, crop and image formats built in, and a rebuild on publish; tested end to end in the portfolio. See `docs/research/2026-11-12-cms-client-editing.md`.
+- **Tests: Vitest for logic and scripts, Playwright for the built pages** (desktop and phone profiles, reduced motion, no JS, keyboard). Why: motion changes go in without breaking focus, layout or the no-JS floor.
+- **Publishing:** by hand following `DEPLOY.md`; with a CMS on an SFTP host (one.com), the tested publish workflow in `hosting/one-com.md`; on Cloudflare, its build from Git with a deploy hook. Why: a publish in the CMS reaches the live site without Joah.
 - **React islands only where state needs it** (filters, a configurator, a form with live validation): `client:visible` or `client:idle`, never `client:load` without a reason in the spec. GSAP inside an island uses `useGSAP`.
 - **Images** through Astro's `<Image>` / `<Picture>`: AVIF and WebP, `widths` and `sizes`, lazy except the first visible image, which gets `fetchpriority="high"`
 - **Option for app-like projects:** Vite + React (with React Three Fiber and drei for WebGL), chosen in the spec with one line on why. Then install the pack's `optionalSkills` from `packs.json`, one `npx -y skills add` per skill, and prerender every route to static HTML (no blank page before JS).
@@ -36,6 +41,6 @@ After the brainstorm has a direction and before the spec is written:
 
 ### Hosting
 - Static `dist/` works on both kinds of host:
-  - **Apache (e.g. one.com), uploaded by hand:** `public/.htaccess` is copied into `dist/`. Follow the Hosting rules in the template's web-vanilla pack (`packs/web-vanilla/CLAUDE.snippet.md`; the template path is in `~/.claude/project-template-path`), including testing `.htaccess` against the macOS Apache
+  - **Apache (e.g. one.com), uploaded by hand:** `public/.htaccess` is copied into `dist/`. Follow the Hosting rules in the template's web-vanilla pack (`packs/web-vanilla/CLAUDE.snippet.md`; the template path is in `~/.claude/project-template-path`), and on one.com the template's `hosting/one-com.md`, including testing `.htaccess` against the macOS Apache
   - **Cloudflare, built from Git:** Workers with static assets (Cloudflare's default for new projects) or Pages, build command `npm run build`, output `dist/`. Use a `*.pages.dev` or `*.workers.dev` preview for tests on a real phone
 - Design: work through `DESIGN_CHECKLIST.md` at the spec and before launch; `web-design-guidelines` before launch

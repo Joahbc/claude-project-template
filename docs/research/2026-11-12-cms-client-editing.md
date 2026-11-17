@@ -1,6 +1,6 @@
 # CMS for client editing on Cloudflare
 
-Status: **research** (untested). Checked 2026-11-12. For: Dariia Taradai (Valencia-based artist, dariia.art, hosted on Cloudflare), and any client who adds and updates content themselves.
+Status: **research**; **Sanity: tested in the portfolio** (2026-11: Studio, image pipeline, rebuild on publish to Cloudflare and to one.com; notes for Dariia in `joahbrandrup-portfolio` PROCESS.md, Plan 3 Task 7 and 2026-11-17). Checked 2026-11-12. For: Dariia Taradai (Valencia-based artist, dariia.art, hosted on Cloudflare), and any client who adds and updates content themselves.
 
 ## Requirements
 - **Hard:** the client only ever sees an email-and-password login or "Sign in with Google". No GitHub account for her.

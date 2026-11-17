@@ -109,6 +109,11 @@
           "source": "vercel-labs/agent-skills",
           "skill": "web-design-guidelines",
           "when": "Review step before launch (next to DESIGN_CHECKLIST.md), and before /handover: run it on the built site and show findings by severity before fixing"
+        },
+        {
+          "source": "microsoft/playwright-cli",
+          "skill": "playwright-cli",
+          "when": "Recording motion on reference sites during the brainstorm (view only, never copy their code), and recording the Explore prototypes. Run it through npx (npx -y @playwright/cli@latest, or npx playwright cli once Playwright 1.59+ is a devDependency), never a global install; the default in-memory profile, never the personal one"
         }
       ],
       "optionalSkills": [

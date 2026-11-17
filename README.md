@@ -24,6 +24,7 @@ claude-project-template/
 │   └── coursework/       # school projects with strict rules
 ├── packs.json            # which skills, plugins and mode each pack uses
 ├── references.md         # reference sites and the patterns each is good for
+├── hosting/             # host facts any pack can reference (one-com.md)
 ├── docs/research/        # comparisons not yet tested in a project (promoted at /retro)
 ├── skills/
 │   ├── kickoff/          # /kickoff: scaffolds a new project from this template

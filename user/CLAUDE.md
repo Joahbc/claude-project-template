@@ -14,7 +14,18 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 - Every commit you help with includes a Co-Authored-By line crediting Claude (the model name in it is fine), so AI help is traceable in git history.
 - For risky or visually significant changes: audit first, show me the findings, then apply after I approve
 - Verify before saying something is done: run it, test it, look at it. Say what you checked.
+- Check type checks and tests by their exit code, never by reading or grepping their output. Chain test, commit and push with `&&`, so a failing step stops the push
+- A skipped test is an untested one: say so, and run it where it can run (install the tool, or let CI run it and fail rather than skip)
+- Tests that will run in CI: run them once from a fresh clone first. Tests write temp files to the OS temp folder, never a gitignored folder
+- Anything that touches secrets or the live server gets an independent review (a fresh agent) before it goes live
 - If a rule in CLAUDE.md seems wrong for the situation, tell me instead of silently ignoring it
+
+## Reporting to me
+- Lead with one recommendation. Give options only when the choice really is mine, and keep reports short
+- Explain each technical term in one line the first time it comes up (what it is, why it matters here)
+- Say where a fact came from: your own session, a test, a doc, or me. Never assume I've seen something I haven't
+- Log a bug with the device, browser, input and the steps or command that show it
+- Steps in a dashboard you haven't seen: say they come from docs, give each step's goal and what it should look like, and ask for a screenshot when the screen differs
 
 ## Client data
 - Never serve, upload, commit or print client data: documents, shared files, uploads, customer records, file names that identify a client or a case
@@ -30,7 +41,7 @@ These apply to every project. Project rules in a project's CLAUDE.md can add to 
 
 ## Logging
 - Log meaningful decisions in PROCESS.md as they happen (what, why, alternatives)
-- Draft entries are marked `[draft]` so I can rewrite them in my own words
+- PROCESS.md is an internal log: write entries as final, with no `[draft]` markers. Flag text for me to rewrite only when it goes on the site, to a client, or is graded (the coursework pack)
 - When something goes wrong or a rule you were given causes friction, add a line under "Retro notes" in PROCESS.md
 
 ## Style
