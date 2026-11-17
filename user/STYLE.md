@@ -7,14 +7,17 @@ A living file. It describes the feel I aim for and the craft I bring to every si
 ## The feeling
 Warm, clean and minimal, but never empty. Satisfying to use.
 
+## The material
+An analogue, tactile layer over a clean structure. The structure carries the information, the texture carries the feeling. For my own work: subtle film grain, and a CRT curve on images in motion. Film stays a texture, never a theme: no film strips, reels or countdowns.
+
 ## Proven: shipped in both my portfolios
-- One huge word in an expanded display face (Akira Expanded), with quiet text around it
+- One huge word in an expanded display face, with quiet text around it
 - A mono voice for labels and metadata
 - Hairline rules and small uppercase navigation
 - These are deliberate choices. `frontend-design` lists cream grounds, hairlines and mono labels among common AI defaults, so make them carry information (a hairline that separates real sections, a label that says something true), never decoration.
 
 ## Direction I'm moving in
-- My own work: warm grounds and one hot accent, never pure white. Warm paper with rust (`#FDF7E9`, `#D03B00`, from an unshipped portfolio version) is the clearest example so far.
+- My own work: warm grounds and one hot accent, never pure white. A warm near-black as the default, with a warm paper light mode, each with its own hot accent. The palette itself is chosen in each project's Explore
 - Confident grotesques next to an expanded display face
 
 ## Scale contrast
@@ -35,9 +38,31 @@ Licensed for how they're used. Demo fonts are for sketches only; my own publishe
 ## References
 Sites with this feeling are in the template's `references.md`, marked "Joah's style".
 
-## To define in the portfolio redesign
-Filled in during that project, then kept here:
-- [ ] Easing curves and durations (named, e.g. `--ease-out-soft`, with the values)
-- [ ] A type scale (display, headings, body, mono labels; sizes at 320px and desktop)
-- [ ] A grid (columns, gutters, margins, how the huge thing breaks it)
-- [ ] What "satisfying" means as concrete interactions (e.g. how a drag settles, how a hover answers)
+## Craft defaults (from the portfolio redesign, 2026-11)
+Principles proven in that project, to start from on the next. The numbers are chosen or measured in each project's Explore and live in its own docs (the portfolio's: `docs/design/values.md` in joahbrandrup-portfolio).
+
+### Motion: one physical language
+- A damped spring for anything that answers a hand (a huge word, drag give, an end stretch, hover and focus): it settles, never stops dead, never wobbles for long. Measure it on a reference you like rather than guessing
+- Smooth scroll on desktop only; off on touch and with reduced motion
+- A sine in-out ease for scrubbed and travelling things; a soft ease-out for things that open in answer to you
+- Drag and fling carry inertia that settles in about a second and a half
+- Distortion (fringing, bend, grain) grows with speed and is clean at rest
+- A short fade is the reduced-motion version of every transition
+
+### Type
+- A fluid scale from 320 px to desktop (`clamp()`), with a display step that fills the width between the gutters
+- Body lines at most about 68 characters; mono labels small, uppercase and tracked
+- Size a huge word from its measured advance width: font size = the width between the gutters / the word's width in em. Measure it in the build, and again if the letters are split into spans (kerning changes)
+
+### Grid
+- A fluid gutter; 12 columns on desktop, 6 on tablets, 4 on phones
+- Text in at most 7 desktop columns
+- The huge word may break the grid and the edge of the screen
+- Sections separated by space, not boxes
+
+### What "satisfying" means, concretely
+- Things answer you, and only you: nothing moves on its own except the grain
+- Every answer settles on the spring: never stops dead, never wobbles for long
+- Your speed shows (fringing, a reel's spin, the grain rising) and fades when you stop
+- Opening something grows out of where you touched it
+- The site never traps you: the wheel and the swipe always get you down the page
